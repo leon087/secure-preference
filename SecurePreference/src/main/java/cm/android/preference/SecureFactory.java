@@ -1,10 +1,10 @@
-package cm.android.sdk.preference;
+package cm.android.preference;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import cm.android.sdk.preference.encryption.Encrypter;
-import cm.android.sdk.preference.encryption.IEncrypt;
-import cm.android.sdk.preference.util.SecureUtil;
+import cm.android.preference.encryption.Encrypter;
+import cm.android.preference.encryption.IEncrypt;
+import cm.android.preference.util.SecureUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,11 +24,11 @@ public final class SecureFactory {
     }
 
     /**
-     * Creates the {@link SecureSharedPreferences} instance with a given original and an {@link cm.android.sdk.preference.encryption.IEncrypt}.
+     * Creates the {@link SecureSharedPreferences} instance with a given original and an {@link cm.android.preference.encryption.IEncrypt}.
      * This function does a version check and the required migrations when the local structure is outdated or not encrypted yet.
      *
      * @param original   The original {@link android.content.SharedPreferences}, which can be also a {@link SecureSharedPreferences} instance.
-     * @param encryption The {@link cm.android.sdk.preference.encryption.IEncrypt} to use.
+     * @param encryption The {@link cm.android.preference.encryption.IEncrypt} to use.
      * @return A {@link SecureSharedPreferences} instance.
      */
     public static SecureSharedPreferences getPreferences(SharedPreferences original, IEncrypt encryption) {
@@ -51,7 +51,7 @@ public final class SecureFactory {
      *
      * @param context         The current context.
      * @param preferencesName The name of the {@link android.content.SharedPreferences}.
-     * @param encryption      The {@link cm.android.sdk.preference.encryption.IEncrypt} to use.
+     * @param encryption      The {@link cm.android.preference.encryption.IEncrypt} to use.
      * @return The initialized {@link SecureSharedPreferences}.
      */
     public static SecureSharedPreferences getPreferences(Context context, String preferencesName, IEncrypt encryption) {

@@ -1,4 +1,4 @@
-package cm.android.sdk.preference.encryption;
+package cm.android.preference.encryption;
 
 public interface IEncrypt {
 

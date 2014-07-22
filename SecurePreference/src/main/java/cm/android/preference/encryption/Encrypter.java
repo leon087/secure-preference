@@ -1,4 +1,4 @@
-package cm.android.sdk.preference.encryption;
+package cm.android.preference.encryption;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -6,15 +6,14 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.provider.Settings;
 import android.text.TextUtils;
-import cm.android.sdk.preference.util.SecureUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import cm.android.preference.util.SecureUtil;
 
+import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-import java.io.*;
+import javax.crypto.spec.SecretKeySpec;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
@@ -22,124 +21,53 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 
 /**
- * Encrypting / decrypting support algorithms and type conversions.
  */
-public class EncryptionHelper {
-    private static final Logger LOGGER = LoggerFactory.getLogger(EncryptionHelper.class);
-    private IEncrypt encryption;
+public class Encrypter implements IEncrypt {
+    // private static final String AES_KEY_ALG = "AES/GCM/NoPadding";
+    // private static final String AES_KEY_ALG = "AES/CBC/PKCS5Padding";
+    private static final String AES_KEY_ALG = "AES";
 
-    /**
-     * Initializes with ecryption.
-     *
-     * @param encryption The {@link IEncrypt} to use.
-     */
-    public EncryptionHelper(IEncrypt encryption) {
-        super();
-        this.encryption = encryption;
+    // change to SC if using Spongycastle crypto libraries
+    public static final String PROVIDER = "BC";
+
+    private byte[] key;
+
+    public Encrypter() {
     }
 
-    /**
-     * Reads a value from a {@link android.content.SharedPreferences}.
-     *
-     * @param <T>      The type of the result and the default value.
-     * @param prefs    The preferences to use.
-     * @param key      The key to read.
-     * @param defValue The default value, when the key does not exist.
-     * @return Return the T type of result.
-     */
-    @SuppressWarnings("unchecked")
-    public <T> T getValue(SharedPreferences prefs, String key, T defValue) {
-        String keyEncrypt = encrypt(key.getBytes());
+    @Override
+    public void initKey(byte[] key) {
+        this.key = key;
+    }
 
-        T result = defValue;
-        ObjectInputStream ois = readDecoded(prefs, keyEncrypt);
-        if (ois != null) {
-            try {
-                result = (T) ois.readObject();
-            } catch (IOException e) {
-                LOGGER.error("Error reading value by key: {}", key, e);
-            } catch (ClassNotFoundException e) {
-                LOGGER.error("Error reading value by key: {}", key, e);
-            }
+    @Override
+    public byte[] encrypt(byte[] bytes) throws EncryptionException {
+        if (bytes == null || bytes.length == 0) {
+            return bytes;
         }
-        return result;
-    }
-
-    public <T> void putValue(SharedPreferences.Editor editor, String key, T value) {
-        String keyEncrypt = encrypt(key.getBytes());
-        String valueEncrypt = encode(value);
-        editor.putString(keyEncrypt, valueEncrypt);
-    }
-
-    /**
-     * Encodes a single value to string.
-     * May result null on an internal problem.
-     *
-     * @param <T>   The type of the value.
-     * @param value The T type of value to encrypt.
-     * @return The encrypted value as string.
-     */
-    private <T> String encode(T value) {
-        String result = null;
-        if (value != null) {
-            try {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                ObjectOutputStream oos = new ObjectOutputStream(baos);
-                oos.writeObject(value);
-                byte[] byteArray = baos.toByteArray();
-                result = encrypt(byteArray);
-            } catch (IOException e) {
-                LOGGER.error("Error encoding value", e);
-            }
-        }
-        return result;
-    }
-
-    private <T> String encrypt(byte[] byteArray) {
         try {
-            byte[] encrypt = encryption.encrypt(byteArray);
-            String result = SecureUtil.encode(encrypt);
-            return result;
-        } catch (EncryptionException e) {
-            LOGGER.error("Error encoding value", e);
-            return new String(byteArray);
+            final Cipher cipher = Cipher.getInstance(AES_KEY_ALG, PROVIDER);
+            cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(
+                    key, AES_KEY_ALG));
+            return cipher.doFinal(bytes);
+        } catch (Exception e) {
+            return null;
         }
     }
 
-    private byte[] decrypt(String stringValue) throws EncryptionException {
-        byte[] decodedBytes = SecureUtil.decode(stringValue);
-        byte[] decoded = encryption.decrypt(decodedBytes);
-        return decoded;
-    }
-
-    private ObjectInputStream readDecoded(SharedPreferences prefs, String key) {
-        String stringValue = prefs.getString(key, null);
-        ObjectInputStream result;
-        if (stringValue != null) {
-            try {
-                result = createDecodedObjectStream(stringValue);
-            } catch (EncryptionException e) {
-                LOGGER.error("Error reading from properties. Key: {}", key, e);
-                result = null;
-            }
-        } else {
-            result = null;
+    @Override
+    public byte[] decrypt(byte[] bytes) throws EncryptionException {
+        if (bytes == null || bytes.length == 0) {
+            return bytes;
         }
-        return result;
-    }
-
-    private ObjectInputStream createDecodedObjectStream(String stringValue) throws EncryptionException {
-        byte[] decoded = decrypt(stringValue);
         try {
-            return new ObjectInputStream(new ByteArrayInputStream(decoded));
-        } catch (IOException e) {
-            throw new EncryptionException(e);
+            final Cipher cipher = Cipher.getInstance(AES_KEY_ALG, PROVIDER);
+            cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(
+                    key, AES_KEY_ALG));
+            return cipher.doFinal(bytes);
+        } catch (Exception e) {
+            return null;
         }
-    }
-
-    public boolean contains(SharedPreferences preference, String key) {
-        String keyEncrypt = encrypt(key.getBytes());
-        return preference.contains(keyEncrypt);
     }
 
     public static class KeyHelper {
@@ -264,5 +192,4 @@ public class EncryptionHelper {
             return SecureUtil.encode(generator.generateKey().getEncoded());
         }
     }
-
 }

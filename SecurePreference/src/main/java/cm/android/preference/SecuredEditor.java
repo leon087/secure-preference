@@ -1,9 +1,9 @@
-package cm.android.sdk.preference;
+package cm.android.preference;
 
 import android.annotation.TargetApi;
 import android.content.SharedPreferences.Editor;
 import android.os.Build;
-import cm.android.sdk.preference.encryption.EncryptionHelper;
+import cm.android.preference.encryption.EncryptionHelper;
 
 import java.util.Set;
 

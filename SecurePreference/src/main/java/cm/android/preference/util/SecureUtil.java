@@ -1,16 +1,16 @@
-package cm.android.sdk.preference.util;
+package cm.android.preference.util;
 
 import android.annotation.TargetApi;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.util.Base64;
-import cm.android.sdk.preference.SecuredEditor;
+import cm.android.preference.SecuredEditor;
 
 import java.util.Map;
 import java.util.Set;
 
 /**
- * Util classes for {@link cm.android.sdk.preference.SecureFactory}.
+ * Util classes for {@link cm.android.preference.SecureFactory}.
  */
 public final class SecureUtil {
     private static final String VERSION_KEY = "SecurePreferences_version";
