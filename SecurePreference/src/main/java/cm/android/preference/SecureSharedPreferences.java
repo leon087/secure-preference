@@ -28,8 +28,8 @@ public class SecureSharedPreferences implements SharedPreferences {
     }
 
     @Override
-    public SecuredEditor edit() {
-        return new SecuredEditor(helper, prefs.edit());
+    public SecureEditor edit() {
+        return new SecureEditor(helper, prefs.edit());
     }
 
     @Override
@@ -85,7 +85,7 @@ public class SecureSharedPreferences implements SharedPreferences {
     /**
      * An {@link android.content.SharedPreferences.Editor} decorator.
      */
-    public static class SecuredEditor implements Editor {
+    public static class SecureEditor implements Editor {
         private Editor editor;
         private EncryptionHelper helper;
 
@@ -96,55 +96,55 @@ public class SecureSharedPreferences implements SharedPreferences {
          * @param helper The helper to use.
          * @param edit   The editor to use.
          */
-        public SecuredEditor(EncryptionHelper helper, Editor edit) {
+        public SecureEditor(EncryptionHelper helper, Editor edit) {
             this.helper = helper;
             this.editor = edit;
         }
 
         @Override
-        public SecuredEditor putString(String key, String value) {
+        public SecureEditor putString(String key, String value) {
             helper.putValue(editor, key, value);
             return this;
         }
 
         @Override
-        public SecuredEditor putStringSet(String key, Set<String> values) {
+        public SecureEditor putStringSet(String key, Set<String> values) {
             helper.putValue(editor, key, values);
             return this;
         }
 
         @Override
-        public SecuredEditor putInt(String key, int value) {
+        public SecureEditor putInt(String key, int value) {
             helper.putValue(editor, key, value);
             return this;
         }
 
         @Override
-        public SecuredEditor putLong(String key, long value) {
+        public SecureEditor putLong(String key, long value) {
             helper.putValue(editor, key, value);
             return this;
         }
 
         @Override
-        public SecuredEditor putFloat(String key, float value) {
+        public SecureEditor putFloat(String key, float value) {
             helper.putValue(editor, key, value);
             return this;
         }
 
         @Override
-        public SecuredEditor putBoolean(String key, boolean value) {
+        public SecureEditor putBoolean(String key, boolean value) {
             helper.putValue(editor, key, value);
             return this;
         }
 
         @Override
-        public SecuredEditor remove(String key) {
+        public SecureEditor remove(String key) {
             editor.remove(key);
             return this;
         }
 
         @Override
-        public SecuredEditor clear() {
+        public SecureEditor clear() {
             editor.clear();
             return this;
         }
@@ -180,7 +180,7 @@ public class SecureSharedPreferences implements SharedPreferences {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
                 editor.apply();
             } else {
-                synchronized (SecuredEditor.class) {
+                synchronized (SecureEditor.class) {
                     editor.commit();
                 }
             }

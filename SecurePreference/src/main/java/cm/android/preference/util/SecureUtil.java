@@ -54,7 +54,7 @@ public final class SecureUtil {
             }
         }
         edit.putInt(VERSION_KEY, version);
-        SecureSharedPreferences.SecuredEditor.compatilitySave(edit);
+        SecureSharedPreferences.SecureEditor.compatilitySave(edit);
     }
 
     /**
