@@ -4,7 +4,7 @@ import android.annotation.TargetApi;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.util.Base64;
-import cm.android.preference.SecuredEditor;
+import cm.android.preference.SecureSharedPreferences;
 
 import java.util.Map;
 import java.util.Set;
@@ -54,7 +54,7 @@ public final class SecureUtil {
             }
         }
         edit.putInt(VERSION_KEY, version);
-        SecuredEditor.compatilitySave(edit);
+        SecureSharedPreferences.SecuredEditor.compatilitySave(edit);
     }
 
     /**
