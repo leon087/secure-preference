@@ -102,14 +102,11 @@ public class Encrypter implements IEncrypt {
 
             SecretKey key;
             try {
-                // TODO: what if there's an OS upgrade and now supports the primary
-                // PBE
+                // TODO: what if there's an OS upgrade and now supports the primary PBE
                 key = generatePBEKey(password, salt,
                         PRIMARY_PBE_KEY_ALG, ITERATIONS, KEY_SIZE);
             } catch (NoSuchAlgorithmException e) {
-                // older devices may not support the have the implementation try
-                // with a weaker
-                // algorthm
+                // older devices may not support the have the implementation try with a weaker algorthm
                 key = generatePBEKey(password, salt,
                         BACKUP_PBE_KEY_ALG, ITERATIONS, KEY_SIZE);
             }
