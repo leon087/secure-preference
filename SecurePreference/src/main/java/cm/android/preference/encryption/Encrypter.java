@@ -78,10 +78,10 @@ public class Encrypter implements IEncrypt {
         private static final String BACKUP_PBE_KEY_ALG = "PBEWithMD5AndDES";
         private static final int ITERATIONS = 2000;
 
-        public static byte[] initKey(Context context, SharedPreferences preference) {
+        public static byte[] initKey(Context context, String tag, SharedPreferences preference) {
             // Initialize encryption/decryption key
             try {
-                final String key = generateAesKeyName(context);
+                final String key = generateAesKeyName(context, tag);
                 String value = preference.getString(key, null);
                 if (value == null) {
                     value = generateAesKeyValue();
@@ -93,10 +93,10 @@ public class Encrypter implements IEncrypt {
             }
         }
 
-        private static String generateAesKeyName(Context context)
+        private static String generateAesKeyName(Context context, String tag)
                 throws InvalidKeySpecException, NoSuchAlgorithmException,
                 NoSuchProviderException {
-            final char[] password = context.getPackageName().toCharArray();
+            final char[] password = (context.getPackageName() + tag).toCharArray();
 
             final byte[] salt = getDeviceSerialNumber(context).getBytes();
 

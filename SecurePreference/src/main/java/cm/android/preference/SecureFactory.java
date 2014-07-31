@@ -61,7 +61,7 @@ public final class SecureFactory {
     public static SecureSharedPreferences getPreferences(Context context, String preferencesName) {
         SharedPreferences preference = context.getSharedPreferences(preferencesName, Context.MODE_PRIVATE);
         IEncrypt encryption = new Encrypter();
-        encryption.initKey(Encrypter.KeyHelper.initKey(context, preference));
+        encryption.initKey(Encrypter.KeyHelper.initKey(context, preferencesName, preference));
         return getPreferences(preference, encryption);
     }
 }
