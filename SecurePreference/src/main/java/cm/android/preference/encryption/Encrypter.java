@@ -6,19 +6,18 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.provider.Settings;
 import android.text.TextUtils;
+import cm.android.preference.util.PBECoder;
 import cm.android.preference.util.SecureUtil;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
 
 /**
  */
@@ -74,20 +73,25 @@ public class Encrypter implements IEncrypt {
 
         private static final int KEY_SIZE = 256;
 
-        private static final String PRIMARY_PBE_KEY_ALG = "PBKDF2WithHmacSHA1";
-        private static final String BACKUP_PBE_KEY_ALG = "PBEWithMD5AndDES";
-        private static final int ITERATIONS = 2000;
-
         public static byte[] initKey(Context context, String tag, SharedPreferences preference) {
             // Initialize encryption/decryption key
+            final char[] password = (context.getPackageName() + tag).toCharArray();
+            final byte[] salt = getDeviceSerialNumber(context).getBytes();
+
             try {
                 final String key = generateAesKeyName(context, tag);
                 String value = preference.getString(key, null);
                 if (value == null) {
-                    value = generateAesKeyValue();
+                    //生成SecretKey
+                    SecretKey secretKey = generateAesKeyValue();
+                    //加密保存
+                    byte[] encryptKey = PBECoder.encrypt(secretKey.getEncoded(), password, salt);
+                    value = SecureUtil.encode(encryptKey);
                     preference.edit().putString(key, value).commit();
                 }
-                return SecureUtil.decode(value);
+                byte[] encryptKey = SecureUtil.decode(value);
+                byte[] secretKeyEncoded = PBECoder.decrypt(encryptKey, password, salt);
+                return secretKeyEncoded;
             } catch (Exception e) {
                 throw new IllegalStateException(e);
             }
@@ -100,50 +104,8 @@ public class Encrypter implements IEncrypt {
 
             final byte[] salt = getDeviceSerialNumber(context).getBytes();
 
-            SecretKey key;
-            try {
-                // TODO: what if there's an OS upgrade and now supports the primary PBE
-                key = generatePBEKey(password, salt,
-                        PRIMARY_PBE_KEY_ALG, ITERATIONS, KEY_SIZE);
-            } catch (NoSuchAlgorithmException e) {
-                // older devices may not support the have the implementation try with a weaker algorthm
-                key = generatePBEKey(password, salt,
-                        BACKUP_PBE_KEY_ALG, ITERATIONS, KEY_SIZE);
-            }
+            Key key = PBECoder.genHashKey(password, salt);
             return SecureUtil.encode(key.getEncoded());
-        }
-
-        /**
-         * Derive a secure key based on the passphraseOrPin
-         *
-         * @param passphraseOrPin
-         * @param salt
-         * @param algorthm        - which PBE algorthm to use. some <4.0 devices don;t support
-         *                        the prefered PBKDF2WithHmacSHA1
-         * @param iterations      - Number of PBKDF2 hardening rounds to use. Larger values
-         *                        increase computation time (a good thing), defaults to 1000 if
-         *                        not set.
-         * @param keyLength
-         * @return Derived Secretkey
-         * @throws java.security.NoSuchAlgorithmException
-         * @throws java.security.spec.InvalidKeySpecException
-         * @throws java.security.NoSuchProviderException
-         */
-        private static SecretKey generatePBEKey(char[] passphraseOrPin,
-                                                byte[] salt, String algorthm, int iterations, int keyLength)
-                throws NoSuchAlgorithmException, InvalidKeySpecException,
-                NoSuchProviderException {
-
-            if (iterations == 0) {
-                iterations = 1000;
-            }
-
-            SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(
-                    algorthm, Encrypter.PROVIDER);
-            KeySpec keySpec = new PBEKeySpec(passphraseOrPin, salt, iterations,
-                    keyLength);
-            SecretKey secretKey = secretKeyFactory.generateSecret(keySpec);
-            return secretKey;
         }
 
         /**
@@ -171,7 +133,7 @@ public class Encrypter implements IEncrypt {
             }
         }
 
-        private static String generateAesKeyValue() throws NoSuchAlgorithmException {
+        private static SecretKey generateAesKeyValue() throws NoSuchAlgorithmException {
             // Do *not* seed secureRandom! Automatically seeded from system entropy
             final SecureRandom random = new SecureRandom();
 
@@ -186,7 +148,9 @@ public class Encrypter implements IEncrypt {
                     generator.init(128, random);
                 }
             }
-            return SecureUtil.encode(generator.generateKey().getEncoded());
+
+            return generator.generateKey();
+            //return SecureUtil.encode(generator.generateKey().getEncoded());
         }
     }
 }
