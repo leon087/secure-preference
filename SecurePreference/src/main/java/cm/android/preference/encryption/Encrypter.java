@@ -79,7 +79,7 @@ public class Encrypter implements IEncrypt {
             final byte[] salt = getDeviceSerialNumber(context).getBytes();
 
             try {
-                final String key = generateAesKeyName(context, tag);
+                final String key = generateAesKeyName(password, salt);
                 String value = preference.getString(key, null);
                 if (value == null) {
                     //生成SecretKey
@@ -97,13 +97,9 @@ public class Encrypter implements IEncrypt {
             }
         }
 
-        private static String generateAesKeyName(Context context, String tag)
+        private static String generateAesKeyName(char[] password, byte[] salt)
                 throws InvalidKeySpecException, NoSuchAlgorithmException,
                 NoSuchProviderException {
-            final char[] password = (context.getPackageName() + tag).toCharArray();
-
-            final byte[] salt = getDeviceSerialNumber(context).getBytes();
-
             Key key = PBECoder.genHashKey(password, salt);
             return SecureUtil.encode(key.getEncoded());
         }
