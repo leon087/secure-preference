@@ -3,13 +3,14 @@ package cm.android.preference.sample;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import cm.android.preference.SecureFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 
@@ -18,6 +19,7 @@ import static cm.android.preference.sample.R.layout;
 
 
 public class MainActivity extends ActionBarActivity {
+    private static final Logger logger = LoggerFactory.getLogger(MainActivity.class);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +42,7 @@ public class MainActivity extends ActionBarActivity {
 
         SharedPreferences.Editor editor = preferences.edit();
         String key = "ggg_key_str" + new Random().nextInt(100);
-        editor.putString(key, "ggg_value");
+        editor.putString(key, "ggg_value" + new Random().nextInt(100));
         editor.commit();
 
         String str = preferences.getString(key, "");
@@ -49,7 +51,8 @@ public class MainActivity extends ActionBarActivity {
         TextView valueView = (TextView) this.findViewById(id.value);
         keyView.setText(key);
         valueView.setText(str);
-        Log.e("ggg", "ggg key = " + key);
+        android.util.Log.e("ggg", "ggg key = " + key);
+        android.util.Log.e("ggg", "ggg map = " + preferences.getAll());
     }
 
 

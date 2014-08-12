@@ -40,11 +40,10 @@ public final class SecureFactory {
         }
         if (SecureUtil.getVersion(sharedPreferences) < VERSION_1) {
             LOGGER.info("Initial migration to Secure storage.");
-            SecureUtil.migrateData(original, sharedPreferences, VERSION_1);
+            //SecureUtil.migrateData(original, sharedPreferences, VERSION_1);
         }
         return sharedPreferences;
     }
-
 
     /**
      * Creates a {@link SecureSharedPreferences} instance.

@@ -34,7 +34,7 @@ public class SecureSharedPreferences implements SharedPreferences {
 
     @Override
     public Map<String, ?> getAll() {
-        return prefs.getAll();
+        return helper.getAll(prefs);
     }
 
     @Override
@@ -96,7 +96,7 @@ public class SecureSharedPreferences implements SharedPreferences {
          * @param helper The helper to use.
          * @param edit   The editor to use.
          */
-        public SecureEditor(EncryptionHelper helper, Editor edit) {
+        private SecureEditor(EncryptionHelper helper, Editor edit) {
             this.helper = helper;
             this.editor = edit;
         }
@@ -139,7 +139,7 @@ public class SecureSharedPreferences implements SharedPreferences {
 
         @Override
         public SecureEditor remove(String key) {
-            editor.remove(key);
+            helper.remove(editor, key);
             return this;
         }
 
