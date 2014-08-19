@@ -40,7 +40,7 @@ public class EncryptionHelper {
     @SuppressWarnings("unchecked")
     public <T> T getValue(SharedPreferences prefs, String key, T defValue) {
         String keyEncrypt = encrypt(key.getBytes());
-        String stringValue = prefs.getString(key, null);
+        String stringValue = prefs.getString(keyEncrypt, null);
         if (stringValue == null) {
             return defValue;
         }
