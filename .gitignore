@@ -2,6 +2,10 @@
 /local.properties
 /.idea/workspace.xml
 .DS_Store
+.idea
+.gradle
+*.iml
+
 build/
 bin
 gen
