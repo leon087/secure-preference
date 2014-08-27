@@ -2,7 +2,7 @@ package cm.android.preference.encryption;
 
 public interface IEncrypt {
 
-    void initKey(byte[] key);
+    void initKey(byte[] key, byte[] iv);
 
     byte[] encrypt(byte[] bytes) throws EncryptionException;
 

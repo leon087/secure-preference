@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import cm.android.preference.encryption.Encrypter;
 import cm.android.preference.encryption.IEncrypt;
-import cm.android.preference.util.SecureUtil;
+import cm.android.preference.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,9 +38,9 @@ public final class SecureFactory {
         } else {
             sharedPreferences = new SecureSharedPreferences(original, encryption);
         }
-        if (SecureUtil.getVersion(sharedPreferences) < VERSION_1) {
+        if (Util.getVersion(sharedPreferences) < VERSION_1) {
             LOGGER.info("Initial migration to Secure storage.");
-            //SecureUtil.migrateData(original, sharedPreferences, VERSION_1);
+            //Util.migrateData(original, sharedPreferences, VERSION_1);
         }
         return sharedPreferences;
     }
@@ -60,7 +60,9 @@ public final class SecureFactory {
     public static SecureSharedPreferences getPreferences(Context context, String preferencesName) {
         SharedPreferences preference = context.getSharedPreferences(preferencesName, Context.MODE_PRIVATE);
         IEncrypt encryption = new Encrypter();
-        encryption.initKey(Encrypter.KeyHelper.initKey(context, preferencesName, preference));
+        byte[] key = Encrypter.KeyHelper.initKey(context, preferencesName, preference);
+        byte[] iv = Encrypter.KeyHelper.initIv(context, preferencesName, preference);
+        encryption.initKey(key, iv);
         return getPreferences(preference, encryption);
     }
 }

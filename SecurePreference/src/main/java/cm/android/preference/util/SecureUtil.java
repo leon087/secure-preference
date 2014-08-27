@@ -1,81 +1,39 @@
 package cm.android.preference.util;
 
-import android.annotation.TargetApi;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.util.Base64;
-import cm.android.preference.SecureSharedPreferences;
+import javax.crypto.spec.IvParameterSpec;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
-import java.util.Map;
-import java.util.Set;
+public class SecureUtil {
+    public static final int SALT_LENGTH = 20;
+    public static final String RANDOM_ALGORITHM = "SHA1PRNG";
 
-/**
- * Util classes for {@link cm.android.preference.SecureFactory}.
- */
-public final class SecureUtil {
-    private static final String VERSION_KEY = "SecurePreferences_version";
+    public static final byte[] IV_DEF = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10};
 
-    /**
-     * Hidden util constructor.
-     */
-    private SecureUtil() {
-    }
+    public static final byte[] SALT_DEF = {(byte) 0xA4, (byte) 0x0B, (byte) 0xC8, (byte) 0x34, (byte) 0xD6, (byte) 0x95, (byte) 0xF3, (byte) 0x13};
 
-    /**
-     * Copies data from one {@link android.content.SharedPreferences} to another.
-     *
-     * @param from    The source.
-     * @param to      The target.
-     * @param version The version code to write into the preferences for future check.
-     */
-    @SuppressWarnings("unchecked")
-    @TargetApi(11)
-    public static void migrateData(SharedPreferences from, SharedPreferences to, int version) {
-        Map<String, ?> all = from.getAll();
-        Set<String> keySet = all.keySet();
-        Editor edit = to.edit();
-        for (String key : keySet) {
-            Object object = all.get(key);
-            if (object == null) {
-                // should not reach here
-                edit.remove(key);
-            } else if (object instanceof String) {
-                edit.putString(key, (String) object);
-            } else if (object instanceof Integer) {
-                edit.putInt(key, (Integer) object);
-            } else if (object instanceof Long) {
-                edit.putLong(key, (Long) object);
-            } else if (object instanceof Float) {
-                edit.putFloat(key, (Float) object);
-            } else if (object instanceof Boolean) {
-                edit.putBoolean(key, (Boolean) object);
-            } else if (object instanceof Set<?>) {
-                edit.putStringSet(key, (Set<String>) object);
-            }
+    public static IvParameterSpec getIv(byte[] iv) {
+        if (iv == null) {
+            iv = SecureUtil.IV_DEF;
         }
-        edit.putInt(VERSION_KEY, version);
-        SecureSharedPreferences.SecureEditor.compatilitySave(edit);
+        return new IvParameterSpec(iv);
     }
 
-    /**
-     * Gets the version of {@link android.content.SharedPreferences} if any.
-     *
-     * @param preferences
-     * @return The version or -1.
-     */
-    public static int getVersion(SharedPreferences preferences) {
-        int currentVersion = preferences.getInt(VERSION_KEY, -1);
-        return currentVersion;
+    public static byte[] generateIv() {
+        byte[] iv = new byte[16];
+        try {
+            SecureRandom random = SecureRandom.getInstance(RANDOM_ALGORITHM);
+            random.nextBytes(iv);
+        } catch (NoSuchAlgorithmException e) {
+            return IV_DEF;
+        }
+        return iv;
     }
 
-    @TargetApi(8)
-    public static String encode(byte[] input) {
-        return Base64.encodeToString(input, Base64.NO_PADDING | Base64.NO_WRAP);
+    public static byte[] generateSalt() throws NoSuchAlgorithmException {
+        SecureRandom random = SecureRandom.getInstance(RANDOM_ALGORITHM);
+        byte[] salt = new byte[SALT_LENGTH];
+        random.nextBytes(salt);
+        return salt;
     }
-
-    @TargetApi(8)
-    public static byte[] decode(String input) {
-        return Base64.decode(input, Base64.NO_PADDING | Base64.NO_WRAP);
-    }
-
 }

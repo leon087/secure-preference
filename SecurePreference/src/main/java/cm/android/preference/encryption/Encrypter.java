@@ -6,37 +6,32 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.provider.Settings;
 import android.text.TextUtils;
-import cm.android.preference.util.PBECoder;
+import cm.android.preference.util.AESCoder;
+import cm.android.preference.util.PBEAESCoder;
 import cm.android.preference.util.SecureUtil;
+import cm.android.preference.util.Util;
 
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 
 /**
  */
 public class Encrypter implements IEncrypt {
-    // private static final String AES_KEY_ALG = "AES/GCM/NoPadding";
-    // private static final String AES_KEY_ALG = "AES/CBC/PKCS5Padding";
-    private static final String AES_KEY_ALG = "AES";
-
-    // change to SC if using Spongycastle crypto libraries
-    public static final String PROVIDER = "BC";
 
     private byte[] key;
+    private byte[] iv;
 
     public Encrypter() {
     }
 
     @Override
-    public void initKey(byte[] key) {
+    public void initKey(byte[] key, byte[] iv) {
         this.key = key;
+        this.iv = iv;
     }
 
     @Override
@@ -45,10 +40,9 @@ public class Encrypter implements IEncrypt {
             return bytes;
         }
         try {
-            final Cipher cipher = Cipher.getInstance(AES_KEY_ALG, PROVIDER);
-            cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(
-                    key, AES_KEY_ALG));
-            return cipher.doFinal(bytes);
+            SecretKey secretKey = new SecretKeySpec(key, PBEAESCoder.CIPHER_ALGORITHM);
+            return AESCoder.encrypt(key, iv, bytes);
+//            return PBEAESCoder.encrypt(secretKey, iv, bytes);
         } catch (Exception e) {
             return null;
         }
@@ -60,10 +54,9 @@ public class Encrypter implements IEncrypt {
             return bytes;
         }
         try {
-            final Cipher cipher = Cipher.getInstance(AES_KEY_ALG, PROVIDER);
-            cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(
-                    key, AES_KEY_ALG));
-            return cipher.doFinal(bytes);
+            SecretKey secretKey = new SecretKeySpec(key, PBEAESCoder.CIPHER_ALGORITHM);
+            return AESCoder.decrypt(key, iv, bytes);
+//            return PBEAESCoder.decrypt(secretKey, iv, bytes);
         } catch (Exception e) {
             return null;
         }
@@ -73,35 +66,73 @@ public class Encrypter implements IEncrypt {
 
         private static final int KEY_SIZE = 256;
 
+        public static byte[] initIv(Context context, String tag, SharedPreferences preference) {
+            final char[] password = (context.getPackageName() + tag).toCharArray();
+            final byte[] salt = getDeviceSerialNumber(context).getBytes();
+
+            try {
+                final String key = generateKeyName(password, salt);
+                String value = preference.getString(key, null);
+                if (value == null) {
+                    byte[] iv = SecureUtil.generateIv();
+                    byte[] encryptKey = PBEAESCoder.encrypt(password, salt, null, iv);
+                    value = Util.encode(encryptKey);
+                    preference.edit().putString(key, value).commit();
+                    return iv;
+                } else {
+                    byte[] encryptData = Util.decode(value);
+                    byte[] data = PBEAESCoder.decrypt(password, salt, null, encryptData);
+                    return data;
+                }
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+        }
+
         public static byte[] initKey(Context context, String tag, SharedPreferences preference) {
             // Initialize encryption/decryption key
             final char[] password = (context.getPackageName() + tag).toCharArray();
             final byte[] salt = getDeviceSerialNumber(context).getBytes();
 
             try {
-                final String key = generateAesKeyName(password, salt);
-                String value = preference.getString(key, null);
-                if (value == null) {
-                    //生成SecretKey
-                    SecretKey secretKey = generateAesKeyValue();
-                    //加密保存
-                    byte[] encryptKey = PBECoder.encrypt(secretKey.getEncoded(), password, salt);
-                    value = SecureUtil.encode(encryptKey);
-                    preference.edit().putString(key, value).commit();
-                }
-                byte[] encryptKey = SecureUtil.decode(value);
-                byte[] secretKeyEncoded = PBECoder.decrypt(encryptKey, password, salt);
-                return secretKeyEncoded;
+//                Key key = PBEAESCoder.toKey(password, salt);
+                Key key = AESCoder.generateKey((context.getPackageName() + tag).getBytes());
+                return key.getEncoded();
             } catch (Exception e) {
                 throw new IllegalStateException(e);
             }
         }
+//        public static byte[] initKey(Context context, String tag, SharedPreferences preference) {
+//            // Initialize encryption/decryption key
+//            final char[] password = (context.getPackageName() + tag).toCharArray();
+//            final byte[] salt = getDeviceSerialNumber(context).getBytes();
+//
+//            try {
+//                final String key = generateAesKeyName(password, salt);
+//                String value = preference.getString(key, null);
+//                if (value == null) {
+//                    //生成SecretKey
+//                    SecretKey secretKey = AESCoder.generateKey();
+//
+//                    //加密保存
+//                    byte[] encryptKey = PBECoder.encrypt(secretKey.getEncoded(), password, salt);
+//                    value = Util.encode(encryptKey);
+//                    preference.edit().putString(key, value).commit();
+//                }
+//                byte[] encryptKey = Util.decode(value);
+//                byte[] secretKeyEncoded = PBECoder.decrypt(encryptKey, password, salt);
+//                return secretKeyEncoded;
+//            } catch (Exception e) {
+//                throw new IllegalStateException(e);
+//            }
+//        }
 
-        private static String generateAesKeyName(char[] password, byte[] salt)
+        private static String generateKeyName(char[] password, byte[] salt)
                 throws InvalidKeySpecException, NoSuchAlgorithmException,
                 NoSuchProviderException {
-            Key key = PBECoder.genHashKey(password, salt);
-            return SecureUtil.encode(key.getEncoded());
+//            Key key = PBECoder.genHashKey(password, salt);
+            Key key = PBEAESCoder.toKey(password, salt);
+            return Util.encode(key.getEncoded());
         }
 
         /**
@@ -127,26 +158,6 @@ public class Encrypter implements IEncrypt {
                 return Settings.Secure.getString(context.getContentResolver(),
                         Settings.Secure.ANDROID_ID);
             }
-        }
-
-        private static SecretKey generateAesKeyValue() throws NoSuchAlgorithmException {
-            // Do *not* seed secureRandom! Automatically seeded from system entropy
-            final SecureRandom random = new SecureRandom();
-
-            // Use the largest AES key length which is supported by the OS
-            final KeyGenerator generator = KeyGenerator.getInstance("AES");
-            try {
-                generator.init(KEY_SIZE, random);
-            } catch (Exception e) {
-                try {
-                    generator.init(192, random);
-                } catch (Exception e1) {
-                    generator.init(128, random);
-                }
-            }
-
-            return generator.generateKey();
-            //return SecureUtil.encode(generator.generateKey().getEncoded());
         }
     }
 }

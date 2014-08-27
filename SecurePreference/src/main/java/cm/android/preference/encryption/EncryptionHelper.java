@@ -2,7 +2,7 @@ package cm.android.preference.encryption;
 
 import android.content.SharedPreferences;
 import cm.android.preference.util.IoUtil;
-import cm.android.preference.util.SecureUtil;
+import cm.android.preference.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,7 +116,7 @@ public class EncryptionHelper {
     private <T> String encrypt(byte[] byteArray) {
         try {
             byte[] encrypt = encryption.encrypt(byteArray);
-            String result = SecureUtil.encode(encrypt);
+            String result = Util.encode(encrypt);
             return result;
         } catch (EncryptionException e) {
             LOGGER.error("Error encoding value", e);
@@ -125,7 +125,7 @@ public class EncryptionHelper {
     }
 
     private byte[] decrypt(String stringValue) throws EncryptionException {
-        byte[] decodedBytes = SecureUtil.decode(stringValue);
+        byte[] decodedBytes = Util.decode(stringValue);
         byte[] decoded = encryption.decrypt(decodedBytes);
         return decoded;
     }

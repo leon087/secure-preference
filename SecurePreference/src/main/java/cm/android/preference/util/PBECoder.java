@@ -12,6 +12,9 @@ import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 
+/**
+ * 对称加密算法：基于口令加密-PBE算法实现
+ */
 public class PBECoder {
     private static final int KEY_SIZE = 256;
     // change to SC if using Spongycastle crypto libraries

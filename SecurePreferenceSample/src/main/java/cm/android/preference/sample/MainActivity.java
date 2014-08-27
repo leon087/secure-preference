@@ -32,13 +32,14 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onClick(View view) {
                 refresh();
+                refresh2();
             }
         });
 
     }
 
     private void refresh() {
-        SharedPreferences preferences = SecureFactory.getPreferences(this, "test_pref");
+        SharedPreferences preferences = SecureFactory.getPreferences(this, "test_pref_1");
 
         SharedPreferences.Editor editor = preferences.edit();
         String key = "ggg_key_str" + new Random().nextInt(100);
@@ -53,6 +54,15 @@ public class MainActivity extends ActionBarActivity {
         valueView.setText(str);
         android.util.Log.e("ggg", "ggg key = " + key);
         android.util.Log.e("ggg", "ggg map = " + preferences.getAll());
+    }
+
+    private void refresh2() {
+        SharedPreferences preferences = SecureFactory.getPreferences(this, "test_pref_2");
+
+        SharedPreferences.Editor editor = preferences.edit();
+        String key = "ggg_key_str" + new Random().nextInt(100);
+        editor.putString(key, "ggg_value" + new Random().nextInt(100));
+        editor.commit();
     }
 
 
