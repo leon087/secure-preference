@@ -1,11 +1,9 @@
 package cm.android.preference.util;
 
 import javax.crypto.spec.IvParameterSpec;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 public class SecureUtil {
-    public static final int SALT_LENGTH = 20;
     public static final String RANDOM_ALGORITHM = "SHA1PRNG";
 
     public static final byte[] IV_DEF = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10};
@@ -20,20 +18,30 @@ public class SecureUtil {
     }
 
     public static byte[] generateIv() {
-        byte[] iv = new byte[16];
-        try {
-            SecureRandom random = SecureRandom.getInstance(RANDOM_ALGORITHM);
-            random.nextBytes(iv);
-        } catch (NoSuchAlgorithmException e) {
-            return IV_DEF;
-        }
+        return randomByte(16);
+    }
+
+    public static byte[] generateSalt() {
+        return randomByte(20);
+    }
+
+    private static byte[] randomByte(int length) {
+        byte[] iv = new byte[length];
+        SecureRandom random = getSecureRandom();
+        random.nextBytes(iv);
         return iv;
     }
 
-    public static byte[] generateSalt() throws NoSuchAlgorithmException {
-        SecureRandom random = SecureRandom.getInstance(RANDOM_ALGORITHM);
-        byte[] salt = new byte[SALT_LENGTH];
-        random.nextBytes(salt);
-        return salt;
+    public static SecureRandom getSecureRandom() {
+        try {
+            // SHA1PRNG 强随机种子算法, 要区别4.2以上版本的调用方法
+            return SecureRandom.getInstance(RANDOM_ALGORITHM, "Crypto");
+        } catch (Exception e) {
+            try {
+                return SecureRandom.getInstance(RANDOM_ALGORITHM);
+            } catch (Exception e1) {
+                return new SecureRandom();
+            }
+        }
     }
 }

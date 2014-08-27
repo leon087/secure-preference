@@ -13,38 +13,23 @@ public class AESCoder {
 
     public static final String KEY_ALGORITHM = "AES";
 
-    public static final String RANDOM_ALGORITHM = "SHA1PRNG";
-
-    /**
-     * 加密/解密算法/工作模式/填充方式
-     * <p/>
-     * JAVA6 支持PKCS5PADDING填充方式 Bouncy castle支持PKCS7Padding填充方式
-     */
-    public static final String CIPHER_ALGORITHM = "AES/ECB/PKCS5Padding";
-
-    public static byte[] encrypt(String key, byte[] iv, byte[] data) throws Exception {
-        byte[] rawKey = generateKey(key.getBytes()).getEncoded();
+    public static byte[] encryptBySeed(byte[] seed, byte[] iv, byte[] data) throws Exception {
+        byte[] rawKey = generateKey(seed).getEncoded();
         byte[] result = encrypt(rawKey, iv, data);
         return result;
     }
 
-    public static byte[] decrypt(String key, byte[] iv, byte[] encrypted) throws Exception {
-        byte[] rawKey = generateKey(key.getBytes()).getEncoded();
+    public static byte[] decryptBySeed(byte[] seed, byte[] iv, byte[] encrypted) throws Exception {
+        byte[] rawKey = generateKey(seed).getEncoded();
         byte[] result = decrypt(rawKey, iv, encrypted);
         return result;
     }
 
     public static SecretKey generateKey(byte[] seed) throws Exception {
         KeyGenerator kgen = KeyGenerator.getInstance(KEY_ALGORITHM);
-        // SHA1PRNG 强随机种子算法, 要区别4.2以上版本的调用方法
-        SecureRandom sr = null;
-        try {
-            sr = SecureRandom.getInstance(RANDOM_ALGORITHM, "Crypto");
-        } catch (Exception e) {
-            sr = SecureRandom.getInstance(RANDOM_ALGORITHM);
-        }
+        SecureRandom sr = SecureUtil.getSecureRandom();
         sr.setSeed(seed);
-        kgen.init(256, sr); //256 bits or 128 bits,192bits
+        kgen.init(KEY_SIZE, sr); //256 bits or 128 bits,192bits
         SecretKey secretKey = kgen.generateKey();
         return secretKey;
     }
