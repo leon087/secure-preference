@@ -59,8 +59,13 @@ public class Encrypter implements IEncrypt {
     public static class KeyHelper {
 
         public static byte[] initIv(Context context, String tag, SharedPreferences preference) {
-            final char[] password = (context.getPackageName() + tag).toCharArray();
-            final byte[] salt = getDeviceSerialNumber(context).getBytes();
+            String sigStr = "";
+            android.content.pm.Signature[] signatures = Util.getSignature(context.getPackageManager(), context.getPackageName());
+            if (signatures != null && signatures.length > 0) {
+                sigStr = signatures[0].toCharsString();
+            }
+            char[] password = (context.getPackageName() + tag + sigStr).toCharArray();
+            final byte[] salt = getDeviceSerialNumber(context).getBytes();//
 
             try {
                 final String key = generateKeyName(password, salt);

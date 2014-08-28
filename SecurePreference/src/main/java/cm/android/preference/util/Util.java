@@ -3,6 +3,7 @@ package cm.android.preference.util;
 import android.annotation.TargetApi;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageManager;
 import android.util.Base64;
 import cm.android.preference.SecureSharedPreferences;
 
@@ -76,6 +77,18 @@ public final class Util {
     @TargetApi(8)
     public static byte[] decode(String input) {
         return Base64.decode(input, Base64.NO_PADDING | Base64.NO_WRAP);
+    }
+
+    public static android.content.pm.Signature[] getSignature(
+            PackageManager pm, String packageName) {
+        try {
+            android.content.pm.Signature[] sigs = pm.getPackageInfo(
+                    packageName, PackageManager.GET_SIGNATURES).signatures;
+            return sigs;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }
