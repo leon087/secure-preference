@@ -18,7 +18,7 @@ public class HashUtil {
 
     public static final String PROVIDER = "BC";
 
-    private static final int ITERATIONS = 2000;
+    private static final int ITERATIONS = 1000;
     private static final int KEY_SIZE = 256;
 
     public static SecretKey generateHash(char[] password, byte[] salt) throws InvalidKeySpecException, NoSuchAlgorithmException {
