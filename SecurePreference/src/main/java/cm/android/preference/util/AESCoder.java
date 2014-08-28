@@ -12,6 +12,7 @@ public class AESCoder {
     private static final int KEY_SIZE = 256;
 
     public static final String KEY_ALGORITHM = "AES";
+    public static final String C_AES_CBC_PKCS5PADDING = "AES/CBC/PKCS5Padding";
 
     public static byte[] encryptBySeed(byte[] seed, byte[] iv, byte[] data) throws Exception {
         byte[] rawKey = generateKey(seed).getEncoded();
@@ -35,20 +36,20 @@ public class AESCoder {
     }
 
     public static byte[] encrypt(byte[] key, byte[] iv, byte[] src) throws Exception {
-        SecretKeySpec skeySpec = new SecretKeySpec(key, KEY_ALGORITHM);
+        SecretKeySpec skeySpec = new SecretKeySpec(key, C_AES_CBC_PKCS5PADDING);
         IvParameterSpec ivSpec = SecureUtil.getIv(iv);
 
-        Cipher cipher = Cipher.getInstance(KEY_ALGORITHM);
+        Cipher cipher = Cipher.getInstance(C_AES_CBC_PKCS5PADDING);
         cipher.init(Cipher.ENCRYPT_MODE, skeySpec, ivSpec);
         byte[] encrypted = cipher.doFinal(src);
         return encrypted;
     }
 
     public static byte[] decrypt(byte[] key, byte[] iv, byte[] encrypted) throws Exception {
-        SecretKeySpec skeySpec = new SecretKeySpec(key, KEY_ALGORITHM);
+        SecretKeySpec skeySpec = new SecretKeySpec(key, C_AES_CBC_PKCS5PADDING);
         IvParameterSpec ivSpec = SecureUtil.getIv(iv);
 
-        Cipher cipher = Cipher.getInstance(KEY_ALGORITHM);
+        Cipher cipher = Cipher.getInstance(C_AES_CBC_PKCS5PADDING);
         cipher.init(Cipher.DECRYPT_MODE, skeySpec, ivSpec);
         byte[] decrypted = cipher.doFinal(encrypted);
         return decrypted;

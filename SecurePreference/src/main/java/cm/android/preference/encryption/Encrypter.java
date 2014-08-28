@@ -6,9 +6,11 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.provider.Settings;
 import android.text.TextUtils;
-import cm.android.preference.util.*;
+import cm.android.preference.util.AESCoder;
+import cm.android.preference.util.HashUtil;
+import cm.android.preference.util.SecureUtil;
+import cm.android.preference.util.Util;
 
-import javax.crypto.SecretKey;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -65,15 +67,13 @@ public class Encrypter implements IEncrypt {
                 String value = preference.getString(key, null);
                 if (value == null) {
                     byte[] iv = SecureUtil.generateIv();
-                    SecretKey secretKey = PBEAESCoder.generateKey(password, salt);
-                    byte[] encryptKey = PBEAESCoder.encrypt(secretKey, null, iv);
+                    byte[] encryptKey = AESCoder.encryptBySeed(key.getBytes(), null, iv);
                     value = Util.encode(encryptKey);
                     preference.edit().putString(key, value).commit();
                     return iv;
                 } else {
                     byte[] encryptData = Util.decode(value);
-                    SecretKey secretKey = PBEAESCoder.generateKey(password, salt);
-                    byte[] data = PBEAESCoder.decrypt(secretKey, null, encryptData);
+                    byte[] data = AESCoder.decryptBySeed(key.getBytes(), null, encryptData);
                     return data;
                 }
             } catch (Exception e) {
