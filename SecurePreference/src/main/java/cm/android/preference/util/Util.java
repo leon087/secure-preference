@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Util classes for {@link cm.android.preference.SecureFactory}.
+ * Util classes for {@link cm.android.preference.PreferenceFactory}.
  */
 public final class Util {
     private static final String VERSION_KEY = "SecurePreferences_version";

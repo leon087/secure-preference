@@ -11,16 +11,16 @@ import org.slf4j.LoggerFactory;
 /**
  * A factory class to ease the creation of the SecureSharedPreferences instance.
  */
-public final class SecureFactory {
+public final class PreferenceFactory {
     private static final String INITIALIZATION_ERROR = "Can not initialize SecureSharedPreferences";
     public static final int VERSION_1 = 1;
     public static final int LATEST_VERSION = VERSION_1;
-    private static final Logger LOGGER = LoggerFactory.getLogger(SecureFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PreferenceFactory.class);
 
     /**
      * Hidden util constructor.
      */
-    private SecureFactory() {
+    private PreferenceFactory() {
     }
 
     /**
@@ -62,7 +62,8 @@ public final class SecureFactory {
         IEncrypt encryption = new Encrypter();
         byte[] key = Encrypter.KeyHelper.initKey(context, preferencesName, preference);
         byte[] iv = Encrypter.KeyHelper.initIv(context, preferencesName, preference);
-        encryption.initKey(key, iv);
+        encryption.initKey(key, iv, preferencesName);
         return getPreferences(preference, encryption);
     }
+
 }

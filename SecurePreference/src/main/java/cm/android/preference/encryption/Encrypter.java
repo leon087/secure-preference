@@ -27,7 +27,7 @@ public class Encrypter implements IEncrypt {
     }
 
     @Override
-    public void initKey(byte[] key, byte[] iv) {
+    public void initKey(byte[] key, byte[] iv, String tag) {
         this.key = key;
         this.iv = iv;
     }
