@@ -24,7 +24,6 @@ public class AESCoder {
         return secretKey;
     }
 
-
     public static SecretKey generateKey() throws NoSuchAlgorithmException {
         // Do *not* seed secureRandom! Automatically seeded from system entropy
         final SecureRandom random = new SecureRandom();
