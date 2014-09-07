@@ -104,7 +104,7 @@ public class Encrypter implements IEncrypt {
         private static String generateKeyName(char[] password, byte[] salt)
                 throws InvalidKeySpecException, NoSuchAlgorithmException,
                 NoSuchProviderException {
-            Key key = HashUtil.generateHash(password, salt);
+            Key key = HashUtil.generateHash(password, salt, 256);
             return Util.encode(key.getEncoded());
         }
 
