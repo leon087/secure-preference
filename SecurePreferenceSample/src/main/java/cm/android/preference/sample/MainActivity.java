@@ -8,7 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import cm.android.preference.SecureFactory;
+import cm.android.preference.PreferenceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +39,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void refresh() {
-        SharedPreferences preferences = SecureFactory.getPreferences(this, "test_pref_1");
+        SharedPreferences preferences = PreferenceFactory.getPreferences(this, "test_pref_1");
 
         SharedPreferences.Editor editor = preferences.edit();
         String key = "ggg_key_str" + new Random().nextInt(100);
@@ -57,7 +57,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void refresh2() {
-        SharedPreferences preferences = SecureFactory.getPreferences(this, "test_pref_2");
+        SharedPreferences preferences = PreferenceFactory.getPreferences(this, "test_pref_2");
 
         SharedPreferences.Editor editor = preferences.edit();
         String key = "ggg_key_str" + new Random().nextInt(100);
