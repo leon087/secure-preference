@@ -5,10 +5,11 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.util.Base64;
-import cm.android.preference.SecureSharedPreferences;
 
 import java.util.Map;
 import java.util.Set;
+
+import cm.android.preference.SecureSharedPreferences;
 
 /**
  * Util classes for {@link cm.android.preference.PreferenceFactory}.
@@ -71,12 +72,12 @@ public final class Util {
 
     @TargetApi(8)
     public static String encode(byte[] input) {
-        return Base64.encodeToString(input, Base64.NO_PADDING | Base64.NO_WRAP);
+        return Base64.encodeToString(input, Base64.NO_PADDING | Base64.NO_WRAP | Base64.URL_SAFE);
     }
 
     @TargetApi(8)
     public static byte[] decode(String input) {
-        return Base64.decode(input, Base64.NO_PADDING | Base64.NO_WRAP);
+        return Base64.decode(input, Base64.NO_PADDING | Base64.NO_WRAP | Base64.URL_SAFE);
     }
 
     public static android.content.pm.Signature[] getSignature(
