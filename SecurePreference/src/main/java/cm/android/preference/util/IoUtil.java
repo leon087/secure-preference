@@ -2,7 +2,10 @@ package cm.android.preference.util;
 
 import java.io.Closeable;
 
-public class IoUtil {
+public final class IoUtil {
+    private IoUtil() {
+    }
+
     public static void closeQuietly(Closeable closeable) {
         if (closeable != null) {
             try {

@@ -2,14 +2,18 @@ package cm.android.preference.util;
 
 import android.os.Build;
 
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 
-public class HashUtil {
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+
+public final class HashUtil {
+    private HashUtil() {
+    }
+
     private static final String ALG_PBK_LOW = "PBKDF2WithHmacSHA1And8bit";
     private static final String ALG_PBK = "PBKDF2WithHmacSHA1";
 

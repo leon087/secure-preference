@@ -1,19 +1,23 @@
 package cm.android.preference.util;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
+
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
 
-public class AESCoder {
+public final class AESCoder {
     private static final int KEY_SIZE = 256;
 
     public static final String KEY_ALGORITHM = "AES";
     public static final String C_AES_CBC_PKCS5PADDING = "AES/CBC/PKCS5Padding";
+
+    private AESCoder() {
+    }
 
     public static SecretKey generateKey(byte[] seed) throws Exception {
         KeyGenerator kgen = KeyGenerator.getInstance(KEY_ALGORITHM);
