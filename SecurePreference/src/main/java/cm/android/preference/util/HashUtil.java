@@ -42,6 +42,11 @@ public final class HashUtil {
         return key;
     }
 
+    public static SecretKey generateHash(char[] password) throws InvalidKeySpecException, NoSuchAlgorithmException {
+        byte[] salt = SecureUtil.SALT_DEF;
+        return generateHash(password, salt, ITERATIONS);
+    }
+
     public static SecretKey generateHash(char[] password, byte[] salt) throws InvalidKeySpecException, NoSuchAlgorithmException {
         return generateHash(password, salt, ITERATIONS);
     }
