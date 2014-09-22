@@ -1,10 +1,6 @@
 buildscript {
     repositories {
-        //从中央库里面获取依赖
-        mavenCentral()
-        //maven {
-        //    url "https://oss.sonatype.org/content/repositories/snapshots"
-        //}
+        jcenter()
     }
 
     dependencies {
@@ -15,10 +11,6 @@ buildscript {
 tasks.withType(JavaCompile) { options.encoding = "UTF-8" }
 
 apply plugin: 'com.android.library'
-
-repositories {
-    mavenCentral()
-}
 
 android {
     packagingOptions {
@@ -59,7 +51,7 @@ android {
     buildTypes {
         release {
             runProguard false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 }
