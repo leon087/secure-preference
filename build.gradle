@@ -5,7 +5,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.12.+'
+        classpath 'com.android.tools.build:gradle:0.13.3'
     }
 }
 
@@ -17,4 +17,4 @@ allprojects {
     }
 }
 
-task wrapper(type: Wrapper) { gradleVersion = '1.12' }
+task wrapper(type: Wrapper) { gradleVersion = '2.1' }
