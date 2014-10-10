@@ -2,11 +2,13 @@ package cm.android.preference;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cm.android.preference.encryption.Encrypter;
 import cm.android.preference.encryption.IEncrypt;
 import cm.android.preference.util.Util;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A factory class to ease the creation of the SecureSharedPreferences instance.
