@@ -3,23 +3,22 @@ package cm.android.preference;
 import android.annotation.TargetApi;
 import android.content.SharedPreferences;
 import android.os.Build;
-import cm.android.preference.encryption.EncryptionHelper;
-import cm.android.preference.encryption.IEncrypt;
 
 import java.util.Map;
 import java.util.Set;
+
+import cm.android.preference.encryption.EncryptionHelper;
+import cm.android.preference.encryption.IEncrypt;
 
 /**
  */
 public class SecureSharedPreferences implements SharedPreferences {
     private SharedPreferences prefs;
-    private IEncrypt encryption;
     private EncryptionHelper helper;
 
-    public SecureSharedPreferences(SharedPreferences preferences, IEncrypt encryption) {
+    public SecureSharedPreferences(SharedPreferences preferences, IEncrypt keyEncrypter, IEncrypt encryption) {
         this.prefs = preferences;
-        this.encryption = encryption;
-        helper = new EncryptionHelper(encryption);
+        helper = new EncryptionHelper(keyEncrypter, encryption);
     }
 
     @Override

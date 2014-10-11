@@ -33,12 +33,12 @@ public final class PreferenceFactory {
      * @param encryption The {@link cm.android.preference.encryption.IEncrypt} to use.
      * @return A {@link SecureSharedPreferences} instance.
      */
-    public static SecureSharedPreferences getPreferences(SharedPreferences original, IEncrypt encryption) {
+    public static SecureSharedPreferences getPreferences(SharedPreferences original, IEncrypt keyEncrypter, IEncrypt encryption) {
         SecureSharedPreferences sharedPreferences;
         if (original instanceof SecureSharedPreferences) {
             sharedPreferences = (SecureSharedPreferences) original;
         } else {
-            sharedPreferences = new SecureSharedPreferences(original, encryption);
+            sharedPreferences = new SecureSharedPreferences(original, keyEncrypter, encryption);
         }
         if (Util.getVersion(sharedPreferences) < VERSION_1) {
             LOGGER.info("Initial migration to Secure storage.");
@@ -55,8 +55,9 @@ public final class PreferenceFactory {
      * @param encryption      The {@link cm.android.preference.encryption.IEncrypt} to use.
      * @return The initialized {@link SecureSharedPreferences}.
      */
-    public static SecureSharedPreferences getPreferences(Context context, String preferencesName, IEncrypt encryption) {
-        return getPreferences(context.getSharedPreferences(preferencesName, Context.MODE_PRIVATE), encryption);
+    public static SecureSharedPreferences getPreferences(Context context, String preferencesName, IEncrypt keyEncrypter, IEncrypt encryption) {
+        SharedPreferences preference = context.getSharedPreferences(preferencesName, Context.MODE_PRIVATE);
+        return getPreferences(preference, keyEncrypter, encryption);
     }
 
     public static SecureSharedPreferences getPreferences(Context context, String preferencesName) {
@@ -65,7 +66,8 @@ public final class PreferenceFactory {
         byte[] key = Encrypter.KeyHelper.initKey(context, preferencesName, preference);
         byte[] iv = Encrypter.KeyHelper.initIv(context, preferencesName, preference);
         encryption.initKey(key, iv, preferencesName);
-        return getPreferences(preference, encryption);
+
+        return getPreferences(preference, encryption, encryption);
     }
 
 }
