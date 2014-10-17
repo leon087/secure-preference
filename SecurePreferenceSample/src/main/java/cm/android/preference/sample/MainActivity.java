@@ -8,11 +8,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import cm.android.preference.PreferenceFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Random;
+
+import cm.android.preference.PreferenceFactory;
 
 import static cm.android.preference.sample.R.id;
 import static cm.android.preference.sample.R.layout;
@@ -35,7 +37,6 @@ public class MainActivity extends ActionBarActivity {
                 refresh2();
             }
         });
-
     }
 
     private void refresh() {
