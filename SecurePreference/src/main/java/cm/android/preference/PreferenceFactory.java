@@ -1,10 +1,10 @@
 package cm.android.preference;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import android.content.Context;
+import android.content.SharedPreferences;
 
 import cm.android.preference.encryption.Encrypter;
 import cm.android.preference.encryption.IEncrypt;
@@ -14,9 +14,13 @@ import cm.android.preference.util.Util;
  * A factory class to ease the creation of the SecureSharedPreferences instance.
  */
 public final class PreferenceFactory {
+
     private static final String INITIALIZATION_ERROR = "Can not initialize SecureSharedPreferences";
+
     public static final int VERSION_1 = 1;
+
     public static final int LATEST_VERSION = VERSION_1;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(PreferenceFactory.class);
 
     /**
@@ -26,14 +30,18 @@ public final class PreferenceFactory {
     }
 
     /**
-     * Creates the {@link SecureSharedPreferences} instance with a given original and an {@link cm.android.preference.encryption.IEncrypt}.
-     * This function does a version check and the required migrations when the local structure is outdated or not encrypted yet.
+     * Creates the {@link SecureSharedPreferences} instance with a given original and an {@link
+     * cm.android.preference.encryption.IEncrypt}.
+     * This function does a version check and the required migrations when the local structure is
+     * outdated or not encrypted yet.
      *
-     * @param original   The original {@link android.content.SharedPreferences}, which can be also a {@link SecureSharedPreferences} instance.
+     * @param original   The original {@link android.content.SharedPreferences}, which can be also a
+     *                   {@link SecureSharedPreferences} instance.
      * @param encryption The {@link cm.android.preference.encryption.IEncrypt} to use.
      * @return A {@link SecureSharedPreferences} instance.
      */
-    public static SecureSharedPreferences getPreferences(SharedPreferences original, IEncrypt keyEncrypter, IEncrypt encryption) {
+    public static SecureSharedPreferences getPreferences(SharedPreferences original,
+            IEncrypt keyEncrypter, IEncrypt encryption) {
         SecureSharedPreferences sharedPreferences;
         if (original instanceof SecureSharedPreferences) {
             sharedPreferences = (SecureSharedPreferences) original;
@@ -55,13 +63,16 @@ public final class PreferenceFactory {
      * @param encryption      The {@link cm.android.preference.encryption.IEncrypt} to use.
      * @return The initialized {@link SecureSharedPreferences}.
      */
-    public static SecureSharedPreferences getPreferences(Context context, String preferencesName, IEncrypt keyEncrypter, IEncrypt encryption) {
-        SharedPreferences preference = context.getSharedPreferences(preferencesName, Context.MODE_PRIVATE);
+    public static SecureSharedPreferences getPreferences(Context context, String preferencesName,
+            IEncrypt keyEncrypter, IEncrypt encryption) {
+        SharedPreferences preference = context
+                .getSharedPreferences(preferencesName, Context.MODE_PRIVATE);
         return getPreferences(preference, keyEncrypter, encryption);
     }
 
     public static SecureSharedPreferences getPreferences(Context context, String preferencesName) {
-        SharedPreferences preference = context.getSharedPreferences(preferencesName, Context.MODE_PRIVATE);
+        SharedPreferences preference = context
+                .getSharedPreferences(preferencesName, Context.MODE_PRIVATE);
         IEncrypt encryption = new Encrypter();
         byte[] key = Encrypter.KeyHelper.initKey(context, preferencesName, preference);
         byte[] iv = Encrypter.KeyHelper.initIv(context, preferencesName, preference);

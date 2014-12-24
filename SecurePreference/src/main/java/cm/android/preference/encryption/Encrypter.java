@@ -6,21 +6,23 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.provider.Settings;
 import android.text.TextUtils;
-import cm.android.preference.util.AESCoder;
-import cm.android.preference.util.HashUtil;
-import cm.android.preference.util.SecureUtil;
-import cm.android.preference.util.Util;
 
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.spec.InvalidKeySpecException;
 
+import cm.android.preference.util.AESCoder;
+import cm.android.preference.util.HashUtil;
+import cm.android.preference.util.SecureUtil;
+import cm.android.preference.util.Util;
+
 /**
  */
 public class Encrypter implements IEncrypt {
 
     private byte[] key;
+
     private byte[] iv;
 
     public Encrypter() {
@@ -83,7 +85,8 @@ public class Encrypter implements IEncrypt {
 
         private static String getPassword(Context context, String tag) {
             String sigStr = "";
-            android.content.pm.Signature[] signatures = Util.getSignature(context.getPackageManager(), context.getPackageName());
+            android.content.pm.Signature[] signatures = Util
+                    .getSignature(context.getPackageManager(), context.getPackageName());
             if (signatures != null && signatures.length > 0) {
                 sigStr = signatures[0].toCharsString();
             }

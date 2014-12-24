@@ -1,5 +1,8 @@
 package cm.android.preference.sample;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -8,9 +11,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 
@@ -21,6 +21,7 @@ import static cm.android.preference.sample.R.layout;
 
 
 public class MainActivity extends ActionBarActivity {
+
     private static final Logger logger = LoggerFactory.getLogger(MainActivity.class);
 
     @Override

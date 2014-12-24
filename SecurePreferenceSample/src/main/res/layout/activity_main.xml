@@ -10,7 +10,8 @@
 
     <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
                   android:orientation="vertical">
-        <Button android:layout_width="match_parent" android:layout_height="wrap_content" android:text="refresh"
+        <Button android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="refresh"
                 android:id="@+id/refresh"/>
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
                   android:id="@+id/key"/>

@@ -11,9 +11,11 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public final class AESCoder {
+
     private static final int KEY_SIZE = 256;
 
     public static final String KEY_ALGORITHM = "AES";
+
     public static final String C_AES_CBC_PKCS5PADDING = "AES/CBC/PKCS5Padding";
 
     private AESCoder() {
@@ -48,7 +50,8 @@ public final class AESCoder {
         //return SecureUtil.encode(generator.generateKey().getEncoded());
     }
 
-    public static SecretKey generateKey(char[] password, byte[] salt) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public static SecretKey generateKey(char[] password, byte[] salt)
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
         SecretKey tmp = HashUtil.generateHash(password, salt);
         SecretKey secret = new SecretKeySpec(tmp.getEncoded(), C_AES_CBC_PKCS5PADDING);
         return secret;
@@ -85,7 +88,8 @@ public final class AESCoder {
         return encrypted;
     }
 
-    public static byte[] decrypt(SecretKey secretKey, byte[] iv, byte[] encrypted) throws Exception {
+    public static byte[] decrypt(SecretKey secretKey, byte[] iv, byte[] encrypted)
+            throws Exception {
         IvParameterSpec ivSpec = SecureUtil.getIv(iv);
 
         Cipher cipher = Cipher.getInstance(C_AES_CBC_PKCS5PADDING);

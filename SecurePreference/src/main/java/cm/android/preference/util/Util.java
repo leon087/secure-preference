@@ -15,6 +15,7 @@ import cm.android.preference.SecureSharedPreferences;
  * Util classes for {@link cm.android.preference.PreferenceFactory}.
  */
 public final class Util {
+
     private static final String VERSION_KEY = "SecurePreferences_version";
 
     /**
@@ -62,7 +63,6 @@ public final class Util {
     /**
      * Gets the version of {@link android.content.SharedPreferences} if any.
      *
-     * @param preferences
      * @return The version or -1.
      */
     public static int getVersion(SharedPreferences preferences) {

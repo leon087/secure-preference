@@ -3,6 +3,7 @@ package cm.android.preference.util;
 import java.io.Closeable;
 
 public final class IoUtil {
+
     private IoUtil() {
     }
 

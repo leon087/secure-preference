@@ -11,21 +11,26 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
 public final class HashUtil {
+
     private HashUtil() {
     }
 
     private static final String ALG_PBK_LOW = "PBKDF2WithHmacSHA1And8bit";
+
     private static final String ALG_PBK = "PBKDF2WithHmacSHA1";
 
     private static final String ALG_PBE_LOW = "PBEWithMD5AndDES";
+
     public static final String ALG_PBE = "PBEWithSHA256And256BitAES-CBC-BC";
 
     public static final String PROVIDER = "BC";
 
     private static final int ITERATIONS = 1000;
+
     private static final int KEY_SIZE = 256;
 
-    public static SecretKey generateHash(char[] password, byte[] salt, int iterationCount) throws InvalidKeySpecException, NoSuchAlgorithmException {
+    public static SecretKey generateHash(char[] password, byte[] salt, int iterationCount)
+            throws InvalidKeySpecException, NoSuchAlgorithmException {
         SecretKey key;
         try {
             // TODO: what if there's an OS upgrade and now supports the primary PBE
@@ -42,12 +47,14 @@ public final class HashUtil {
         return key;
     }
 
-    public static SecretKey generateHash(char[] password) throws InvalidKeySpecException, NoSuchAlgorithmException {
+    public static SecretKey generateHash(char[] password)
+            throws InvalidKeySpecException, NoSuchAlgorithmException {
         byte[] salt = SecureUtil.SALT_DEF;
         return generateHash(password, salt, ITERATIONS);
     }
 
-    public static SecretKey generateHash(char[] password, byte[] salt) throws InvalidKeySpecException, NoSuchAlgorithmException {
+    public static SecretKey generateHash(char[] password, byte[] salt)
+            throws InvalidKeySpecException, NoSuchAlgorithmException {
         return generateHash(password, salt, ITERATIONS);
     }
 
@@ -63,7 +70,8 @@ public final class HashUtil {
         }
     }
 
-    private static SecretKey generatePBEKey(char[] password, byte[] salt, String algorthm, int iterations, int keyLength)
+    private static SecretKey generatePBEKey(char[] password, byte[] salt, String algorthm,
+            int iterations, int keyLength)
             throws NoSuchAlgorithmException, InvalidKeySpecException {
         SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(algorthm);
         KeySpec keySpec = new PBEKeySpec(password, salt, iterations, keyLength);

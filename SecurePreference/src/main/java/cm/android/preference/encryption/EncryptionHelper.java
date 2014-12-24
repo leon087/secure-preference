@@ -1,9 +1,9 @@
 package cm.android.preference.encryption;
 
-import android.content.SharedPreferences;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import android.content.SharedPreferences;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -21,8 +21,11 @@ import cm.android.preference.util.Util;
  * Encrypting / decrypting support algorithms and type conversions.
  */
 public class EncryptionHelper {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(EncryptionHelper.class);
+
     private IEncrypt encryption;
+
     private IEncrypt keyEncrypter;
 
     /**

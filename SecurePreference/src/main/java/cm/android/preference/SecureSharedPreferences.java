@@ -13,10 +13,13 @@ import cm.android.preference.encryption.IEncrypt;
 /**
  */
 public class SecureSharedPreferences implements SharedPreferences {
+
     private SharedPreferences prefs;
+
     private EncryptionHelper helper;
 
-    public SecureSharedPreferences(SharedPreferences preferences, IEncrypt keyEncrypter, IEncrypt encryption) {
+    public SecureSharedPreferences(SharedPreferences preferences, IEncrypt keyEncrypter,
+            IEncrypt encryption) {
         this.prefs = preferences;
         helper = new EncryptionHelper(keyEncrypter, encryption);
     }
@@ -68,12 +71,14 @@ public class SecureSharedPreferences implements SharedPreferences {
     }
 
     @Override
-    public void registerOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener listener) {
+    public void registerOnSharedPreferenceChangeListener(
+            OnSharedPreferenceChangeListener listener) {
         prefs.registerOnSharedPreferenceChangeListener(listener);
     }
 
     @Override
-    public void unregisterOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener listener) {
+    public void unregisterOnSharedPreferenceChangeListener(
+            OnSharedPreferenceChangeListener listener) {
         prefs.unregisterOnSharedPreferenceChangeListener(listener);
     }
 
@@ -85,7 +90,9 @@ public class SecureSharedPreferences implements SharedPreferences {
      * An {@link android.content.SharedPreferences.Editor} decorator.
      */
     public static class SecureEditor implements Editor {
+
         private Editor editor;
+
         private EncryptionHelper helper;
 
         /**
@@ -161,9 +168,11 @@ public class SecureSharedPreferences implements SharedPreferences {
 
         /**
          * Compatibility version of original {@link android.content.SharedPreferences.Editor#apply()}
-         * method that simply call {@link android.content.SharedPreferences.Editor#commit()} for pre Android Honeycomb (API 11).
+         * method that simply call {@link android.content.SharedPreferences.Editor#commit()} for pre
+         * Android Honeycomb (API 11).
          * This method is thread safe also on pre API 11.
-         * Note that when two editors are modifying preferences at the same time, the last one to call apply wins. (Android Doc)
+         * Note that when two editors are modifying preferences at the same time, the last one to
+         * call apply wins. (Android Doc)
          */
         public void save() {
             compatilitySave(this);
