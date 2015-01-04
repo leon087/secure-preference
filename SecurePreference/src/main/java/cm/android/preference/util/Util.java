@@ -11,26 +11,13 @@ import java.util.Set;
 
 import cm.android.preference.SecureSharedPreferences;
 
-/**
- * Util classes for {@link cm.android.preference.PreferenceFactory}.
- */
 public final class Util {
 
     private static final String VERSION_KEY = "SecurePreferences_version";
 
-    /**
-     * Hidden util constructor.
-     */
     private Util() {
     }
 
-    /**
-     * Copies data from one {@link android.content.SharedPreferences} to another.
-     *
-     * @param from    The source.
-     * @param to      The target.
-     * @param version The version code to write into the preferences for future check.
-     */
     @SuppressWarnings("unchecked")
     @TargetApi(11)
     public static void migrateData(SharedPreferences from, SharedPreferences to, int version) {
@@ -60,11 +47,6 @@ public final class Util {
         SecureSharedPreferences.SecureEditor.compatilitySave(edit);
     }
 
-    /**
-     * Gets the version of {@link android.content.SharedPreferences} if any.
-     *
-     * @return The version or -1.
-     */
     public static int getVersion(SharedPreferences preferences) {
         int currentVersion = preferences.getInt(VERSION_KEY, -1);
         return currentVersion;

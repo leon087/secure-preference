@@ -33,7 +33,6 @@ public final class HashUtil {
             throws InvalidKeySpecException, NoSuchAlgorithmException {
         SecretKey key;
         try {
-            // TODO: what if there's an OS upgrade and now supports the primary PBE
             key = generatePBEKey(password, salt, ALG_PBK, iterationCount, KEY_SIZE);
         } catch (NoSuchAlgorithmException e) {
             try {

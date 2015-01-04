@@ -10,9 +10,6 @@ import cm.android.preference.encryption.Encrypter;
 import cm.android.preference.encryption.IEncrypt;
 import cm.android.preference.util.Util;
 
-/**
- * A factory class to ease the creation of the SecureSharedPreferences instance.
- */
 public final class PreferenceFactory {
 
     private static final String INITIALIZATION_ERROR = "Can not initialize SecureSharedPreferences";
@@ -23,23 +20,9 @@ public final class PreferenceFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreferenceFactory.class);
 
-    /**
-     * Hidden util constructor.
-     */
     private PreferenceFactory() {
     }
 
-    /**
-     * Creates the {@link SecureSharedPreferences} instance with a given original and an {@link
-     * cm.android.preference.encryption.IEncrypt}.
-     * This function does a version check and the required migrations when the local structure is
-     * outdated or not encrypted yet.
-     *
-     * @param original   The original {@link android.content.SharedPreferences}, which can be also a
-     *                   {@link SecureSharedPreferences} instance.
-     * @param encryption The {@link cm.android.preference.encryption.IEncrypt} to use.
-     * @return A {@link SecureSharedPreferences} instance.
-     */
     public static SecureSharedPreferences getPreferences(SharedPreferences original,
             IEncrypt keyEncrypter, IEncrypt encryption) {
         SecureSharedPreferences sharedPreferences;
@@ -55,14 +38,6 @@ public final class PreferenceFactory {
         return sharedPreferences;
     }
 
-    /**
-     * Creates a {@link SecureSharedPreferences} instance.
-     *
-     * @param context         The current context.
-     * @param preferencesName The name of the {@link android.content.SharedPreferences}.
-     * @param encryption      The {@link cm.android.preference.encryption.IEncrypt} to use.
-     * @return The initialized {@link SecureSharedPreferences}.
-     */
     public static SecureSharedPreferences getPreferences(Context context, String preferencesName,
             IEncrypt keyEncrypter, IEncrypt encryption) {
         SharedPreferences preference = context

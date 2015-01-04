@@ -17,9 +17,6 @@ import java.util.Map;
 import cm.android.preference.util.IoUtil;
 import cm.android.preference.util.Util;
 
-/**
- * Encrypting / decrypting support algorithms and type conversions.
- */
 public class EncryptionHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EncryptionHelper.class);
@@ -28,23 +25,11 @@ public class EncryptionHelper {
 
     private IEncrypt keyEncrypter;
 
-    /**
-     * Initializes with ecryption.
-     */
     public EncryptionHelper(IEncrypt keyEncrypter, IEncrypt encryption) {
         this.encryption = encryption;
         this.keyEncrypter = keyEncrypter;
     }
 
-    /**
-     * Reads a value from a {@link android.content.SharedPreferences}.
-     *
-     * @param <T>      The type of the result and the default value.
-     * @param prefs    The preferences to use.
-     * @param key      The key to read.
-     * @param defValue The default value, when the key does not exist.
-     * @return Return the T type of result.
-     */
     @SuppressWarnings("unchecked")
     public <T> T getValue(SharedPreferences prefs, String key, T defValue) {
         String keyEncrypt = encryptKey(key.getBytes());
@@ -97,14 +82,6 @@ public class EncryptionHelper {
         return decryptedMap;
     }
 
-    /**
-     * Encodes a single value to string.
-     * May result null on an internal problem.
-     *
-     * @param <T>   The type of the value.
-     * @param value The T type of value to encrypt.
-     * @return The encrypted value as string.
-     */
     private <T> String encode(T value) {
         String result = null;
         if (value != null) {

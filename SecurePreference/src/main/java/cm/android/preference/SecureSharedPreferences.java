@@ -10,8 +10,6 @@ import java.util.Set;
 import cm.android.preference.encryption.EncryptionHelper;
 import cm.android.preference.encryption.IEncrypt;
 
-/**
- */
 public class SecureSharedPreferences implements SharedPreferences {
 
     private SharedPreferences prefs;
@@ -86,22 +84,12 @@ public class SecureSharedPreferences implements SharedPreferences {
         return prefs;
     }
 
-    /**
-     * An {@link android.content.SharedPreferences.Editor} decorator.
-     */
     public static class SecureEditor implements Editor {
 
         private Editor editor;
 
         private EncryptionHelper helper;
 
-        /**
-         * Initializes with the {@link EncryptionHelper} an the original
-         * {@link android.content.SharedPreferences.Editor}.
-         *
-         * @param helper The helper to use.
-         * @param edit   The editor to use.
-         */
         private SecureEditor(EncryptionHelper helper, Editor edit) {
             this.helper = helper;
             this.editor = edit;
@@ -166,23 +154,10 @@ public class SecureSharedPreferences implements SharedPreferences {
             editor.apply();
         }
 
-        /**
-         * Compatibility version of original {@link android.content.SharedPreferences.Editor#apply()}
-         * method that simply call {@link android.content.SharedPreferences.Editor#commit()} for pre
-         * Android Honeycomb (API 11).
-         * This method is thread safe also on pre API 11.
-         * Note that when two editors are modifying preferences at the same time, the last one to
-         * call apply wins. (Android Doc)
-         */
         public void save() {
             compatilitySave(this);
         }
 
-        /**
-         * Saves the {@link android.content.SharedPreferences}. See save method.
-         *
-         * @param editor The editor to save/commit.
-         */
         @TargetApi(9)
         public static void compatilitySave(Editor editor) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {

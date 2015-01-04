@@ -17,8 +17,6 @@ import cm.android.preference.util.HashUtil;
 import cm.android.preference.util.SecureUtil;
 import cm.android.preference.util.Util;
 
-/**
- */
 public class Encrypter implements IEncrypt {
 
     private byte[] key;
@@ -111,11 +109,6 @@ public class Encrypter implements IEncrypt {
             return Util.encode(key.getEncoded());
         }
 
-        /**
-         * Gets the hardware serial number of this device.
-         *
-         * @return serial number or Settings.Secure.ANDROID_ID if not available.
-         */
         @TargetApi(3)
         private static String getDeviceSerialNumber(Context context) {
             // We're using the Reflection API because Build.SERIAL is only available
