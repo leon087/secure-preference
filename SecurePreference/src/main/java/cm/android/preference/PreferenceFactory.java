@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import cm.android.preference.encryption.Encrypter;
-import cm.android.preference.encryption.IEncrypt;
+import cm.android.preference.crypto.Cipher;
+import cm.android.preference.crypto.ICipher;
 import cm.android.preference.util.Util;
 
 public final class PreferenceFactory {
@@ -24,12 +24,12 @@ public final class PreferenceFactory {
     }
 
     public static SecureSharedPreferences getPreferences(SharedPreferences original,
-            IEncrypt keyEncrypter, IEncrypt encryption) {
+            ICipher keyCipher, ICipher valueCipher) {
         SecureSharedPreferences sharedPreferences;
         if (original instanceof SecureSharedPreferences) {
             sharedPreferences = (SecureSharedPreferences) original;
         } else {
-            sharedPreferences = new SecureSharedPreferences(original, keyEncrypter, encryption);
+            sharedPreferences = new SecureSharedPreferences(original, keyCipher, valueCipher);
         }
         if (Util.getVersion(sharedPreferences) < VERSION_1) {
             LOGGER.info("Initial migration to Secure storage.");
@@ -39,21 +39,21 @@ public final class PreferenceFactory {
     }
 
     public static SecureSharedPreferences getPreferences(Context context, String preferencesName,
-            IEncrypt keyEncrypter, IEncrypt encryption) {
+            ICipher keyCipher, ICipher valueCipher) {
         SharedPreferences preference = context
                 .getSharedPreferences(preferencesName, Context.MODE_PRIVATE);
-        return getPreferences(preference, keyEncrypter, encryption);
+        return getPreferences(preference, keyCipher, valueCipher);
     }
 
     public static SecureSharedPreferences getPreferences(Context context, String preferencesName) {
         SharedPreferences preference = context
                 .getSharedPreferences(preferencesName, Context.MODE_PRIVATE);
-        IEncrypt encryption = new Encrypter();
-        byte[] key = Encrypter.KeyHelper.initKey(context, preferencesName, preference);
-        byte[] iv = Encrypter.KeyHelper.initIv(context, preferencesName, preference);
-        encryption.initKey(key, iv, preferencesName);
+        ICipher cipher = new Cipher();
+        byte[] key = Cipher.KeyHelper.initKey(context, preferencesName, preference);
+        byte[] iv = Cipher.KeyHelper.initIv(context, preferencesName, preference);
+        cipher.initKey(key, iv, preferencesName);
 
-        return getPreferences(preference, encryption, encryption);
+        return getPreferences(preference, cipher, cipher);
     }
 
 }

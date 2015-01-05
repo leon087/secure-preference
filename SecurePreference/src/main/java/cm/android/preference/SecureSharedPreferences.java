@@ -7,19 +7,19 @@ import android.os.Build;
 import java.util.Map;
 import java.util.Set;
 
-import cm.android.preference.encryption.EncryptionHelper;
-import cm.android.preference.encryption.IEncrypt;
+import cm.android.preference.crypto.CryptoHelper;
+import cm.android.preference.crypto.ICipher;
 
 public class SecureSharedPreferences implements SharedPreferences {
 
     private SharedPreferences prefs;
 
-    private EncryptionHelper helper;
+    private CryptoHelper helper;
 
-    public SecureSharedPreferences(SharedPreferences preferences, IEncrypt keyEncrypter,
-            IEncrypt encryption) {
+    public SecureSharedPreferences(SharedPreferences preferences, ICipher keyCipher,
+            ICipher valueCipher) {
         this.prefs = preferences;
-        helper = new EncryptionHelper(keyEncrypter, encryption);
+        helper = new CryptoHelper(keyCipher, valueCipher);
     }
 
     @Override
@@ -88,9 +88,9 @@ public class SecureSharedPreferences implements SharedPreferences {
 
         private Editor editor;
 
-        private EncryptionHelper helper;
+        private CryptoHelper helper;
 
-        private SecureEditor(EncryptionHelper helper, Editor edit) {
+        private SecureEditor(CryptoHelper helper, Editor edit) {
             this.helper = helper;
             this.editor = edit;
         }

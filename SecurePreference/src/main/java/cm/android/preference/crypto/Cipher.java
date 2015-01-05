@@ -1,4 +1,4 @@
-package cm.android.preference.encryption;
+package cm.android.preference.crypto;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -17,13 +17,13 @@ import cm.android.preference.util.HashUtil;
 import cm.android.preference.util.SecureUtil;
 import cm.android.preference.util.Util;
 
-public class Encrypter implements IEncrypt {
+public class Cipher implements ICipher {
 
     private byte[] key;
 
     private byte[] iv;
 
-    public Encrypter() {
+    public Cipher() {
     }
 
     @Override
@@ -33,7 +33,7 @@ public class Encrypter implements IEncrypt {
     }
 
     @Override
-    public byte[] encrypt(byte[] bytes) throws EncryptionException {
+    public byte[] encrypt(byte[] bytes) throws CryptoException {
         if (bytes == null || bytes.length == 0) {
             return bytes;
         }
@@ -45,7 +45,7 @@ public class Encrypter implements IEncrypt {
     }
 
     @Override
-    public byte[] decrypt(byte[] bytes) throws EncryptionException {
+    public byte[] decrypt(byte[] bytes) throws CryptoException {
         if (bytes == null || bytes.length == 0) {
             return bytes;
         }

@@ -1,4 +1,4 @@
-package cm.android.preference.encryption;
+package cm.android.preference.crypto;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,17 +17,17 @@ import java.util.Map;
 import cm.android.preference.util.IoUtil;
 import cm.android.preference.util.Util;
 
-public class EncryptionHelper {
+public class CryptoHelper {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EncryptionHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CryptoHelper.class);
 
-    private IEncrypt encryption;
+    private ICipher valueCipher;
 
-    private IEncrypt keyEncrypter;
+    private ICipher keyCipher;
 
-    public EncryptionHelper(IEncrypt keyEncrypter, IEncrypt encryption) {
-        this.encryption = encryption;
-        this.keyEncrypter = keyEncrypter;
+    public CryptoHelper(ICipher keyCipher, ICipher valueCipher) {
+        this.valueCipher = valueCipher;
+        this.keyCipher = keyCipher;
     }
 
     @SuppressWarnings("unchecked")
@@ -41,7 +41,7 @@ public class EncryptionHelper {
         try {
             T result = readDecoded(stringValue);
             return result;
-        } catch (EncryptionException e) {
+        } catch (CryptoException e) {
             LOGGER.error("Error reading value by key: {}", key, e);
             return defValue;
         }
@@ -74,7 +74,7 @@ public class EncryptionHelper {
                 String key = new String(keyBytes);
                 Object value = readDecoded((String) entry.getValue());
                 decryptedMap.put(key, value);
-            } catch (EncryptionException e) {
+            } catch (CryptoException e) {
                 continue;
             }
         }
@@ -100,29 +100,29 @@ public class EncryptionHelper {
 
     private <T> String encrypt(byte[] byteArray) {
         try {
-            byte[] encrypt = encryption.encrypt(byteArray);
+            byte[] encrypt = valueCipher.encrypt(byteArray);
             String result = Util.encode(encrypt);
             return result;
-        } catch (EncryptionException e) {
+        } catch (CryptoException e) {
             LOGGER.error("Error encoding value", e);
             return new String(byteArray);
         }
     }
 
-    private byte[] decrypt(String stringValue) throws EncryptionException {
+    private byte[] decrypt(String stringValue) throws CryptoException {
         byte[] decodedBytes = Util.decode(stringValue);
-        byte[] decoded = encryption.decrypt(decodedBytes);
+        byte[] decoded = valueCipher.decrypt(decodedBytes);
         return decoded;
     }
 
-    private <T> T readDecoded(String stringValue) throws EncryptionException {
+    private <T> T readDecoded(String stringValue) throws CryptoException {
         ObjectInputStream ois = null;
         try {
             byte[] decoded = decrypt(stringValue);
             ois = new ObjectInputStream(new ByteArrayInputStream(decoded));
             return (T) ois.readObject();
         } catch (Exception e) {
-            throw new EncryptionException(e);
+            throw new CryptoException(e);
         } finally {
             IoUtil.closeQuietly(ois);
         }
@@ -137,10 +137,10 @@ public class EncryptionHelper {
     public String encryptKey(byte[] keyByteArray) {
         try {
             //确保返回的值固定
-            byte[] encrypt = keyEncrypter.encrypt(keyByteArray);
+            byte[] encrypt = keyCipher.encrypt(keyByteArray);
             String result = Util.encode(encrypt);
             return result;
-        } catch (EncryptionException e) {
+        } catch (CryptoException e) {
             LOGGER.error("Error encoding value", e);
             return new String(keyByteArray);
         } catch (Exception e) {
@@ -152,7 +152,7 @@ public class EncryptionHelper {
     public byte[] decryptKey(String stringValue) {
         byte[] decodedBytes = Util.decode(stringValue);
         try {
-            byte[] decoded = keyEncrypter.decrypt(decodedBytes);
+            byte[] decoded = keyCipher.decrypt(decodedBytes);
             return decoded;
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
