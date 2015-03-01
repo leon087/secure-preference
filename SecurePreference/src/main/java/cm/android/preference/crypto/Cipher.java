@@ -67,13 +67,13 @@ public class Cipher implements ICipher {
                 String value = preference.getString(key, null);
                 if (value == null) {
                     byte[] iv = SecureUtil.generateIv();
-                    byte[] encryptKey = AESCoder.encryptBySeed(key.getBytes(), null, iv);
+                    byte[] encryptKey = AESCoder.encryptByPassword(key.toCharArray(), null, iv);
                     value = Util.encode(encryptKey);
                     preference.edit().putString(key, value).commit();
                     return iv;
                 } else {
                     byte[] encryptData = Util.decode(value);
-                    byte[] data = AESCoder.decryptBySeed(key.getBytes(), null, encryptData);
+                    byte[] data = AESCoder.decryptByPassword(key.toCharArray(), null, encryptData);
                     return data;
                 }
             } catch (Exception e) {
@@ -92,10 +92,10 @@ public class Cipher implements ICipher {
         }
 
         public static byte[] initKey(Context context, String tag, SharedPreferences preference) {
-            final byte[] seed = getPassword(context, tag).getBytes();
+            final char[] password = getPassword(context, tag).toCharArray();
 
             try {
-                Key key = AESCoder.generateKey(seed);
+                Key key = AESCoder.generateKey(password, null);
                 return key.getEncoded();
             } catch (Exception e) {
                 throw new IllegalStateException(e);

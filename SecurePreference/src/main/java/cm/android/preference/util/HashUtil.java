@@ -48,12 +48,14 @@ public final class HashUtil {
     }
 
     public static SecretKey generateHash(char[] password) throws InvalidKeySpecException {
-        byte[] salt = SecureUtil.SALT_DEF;
-        return generateHash(password, salt, ITERATIONS);
+        return generateHash(password, null);
     }
 
     public static SecretKey generateHash(char[] password, byte[] salt)
             throws InvalidKeySpecException {
+        if (null == salt) {
+            salt = SecureUtil.SALT_DEF;
+        }
         return generateHash(password, salt, ITERATIONS);
     }
 

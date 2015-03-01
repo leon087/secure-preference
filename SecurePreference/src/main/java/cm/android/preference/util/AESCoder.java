@@ -21,15 +21,6 @@ public final class AESCoder {
     private AESCoder() {
     }
 
-    public static SecretKey generateKey(byte[] seed) throws Exception {
-        KeyGenerator kgen = KeyGenerator.getInstance(KEY_ALGORITHM);
-        SecureRandom sr = SecureUtil.getSecureRandom();
-        sr.setSeed(seed);
-        kgen.init(KEY_SIZE, sr); //256 bits or 128 bits,192bits
-        SecretKey secretKey = kgen.generateKey();
-        return secretKey;
-    }
-
     public static SecretKey generateKey() throws NoSuchAlgorithmException {
         // Do *not* seed secureRandom! Automatically seeded from system entropy
         final SecureRandom random = new SecureRandom();
@@ -39,11 +30,7 @@ public final class AESCoder {
         try {
             generator.init(KEY_SIZE, random);
         } catch (Exception e) {
-            try {
-                generator.init(192, random);
-            } catch (Exception e1) {
-                generator.init(128, random);
-            }
+            generator.init(128, random);
         }
 
         return generator.generateKey();
@@ -52,19 +39,21 @@ public final class AESCoder {
 
     public static SecretKey generateKey(char[] password, byte[] salt)
             throws NoSuchAlgorithmException, InvalidKeySpecException {
-        SecretKey tmp = HashUtil.generateHash(password, salt);
+        SecretKey tmp = HashUtil.generateHash(password);
         SecretKey secret = new SecretKeySpec(tmp.getEncoded(), C_AES_CBC_PKCS5PADDING);
         return secret;
     }
 
-    public static byte[] encryptBySeed(byte[] seed, byte[] iv, byte[] data) throws Exception {
-        byte[] rawKey = generateKey(seed).getEncoded();
+    public static byte[] encryptByPassword(char[] password, byte[] iv, byte[] data)
+            throws Exception {
+        byte[] rawKey = generateKey(password, SecureUtil.SALT_DEF).getEncoded();
         byte[] result = encrypt(rawKey, iv, data);
         return result;
     }
 
-    public static byte[] decryptBySeed(byte[] seed, byte[] iv, byte[] encrypted) throws Exception {
-        byte[] rawKey = generateKey(seed).getEncoded();
+    public static byte[] decryptByPassword(char[] password, byte[] iv, byte[] encrypted)
+            throws Exception {
+        byte[] rawKey = generateKey(password, SecureUtil.SALT_DEF).getEncoded();
         byte[] result = decrypt(rawKey, iv, encrypted);
         return result;
     }
