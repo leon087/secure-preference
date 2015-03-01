@@ -18,7 +18,7 @@ public final class PreferenceFactory {
 
     public static final int LATEST_VERSION = VERSION_1;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PreferenceFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger("SecurePreference");
 
     private PreferenceFactory() {
     }

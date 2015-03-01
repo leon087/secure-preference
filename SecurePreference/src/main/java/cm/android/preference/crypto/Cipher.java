@@ -71,11 +71,11 @@ public class Cipher implements ICipher {
                     byte[] iv = SecureUtil.generateIv();
                     SecretKey secretKey = AESCoder.generateKey(key.toCharArray(), null);
                     byte[] encryptKey = AESCoder.encrypt(secretKey, null, iv);
-                    value = Util.encode(encryptKey);
+                    value = Util.encodeBase64(encryptKey);
                     preference.edit().putString(key, value).commit();
                     return iv;
                 } else {
-                    byte[] encryptData = Util.decode(value);
+                    byte[] encryptData = Util.decodeBase64(value);
                     SecretKey secretKey = AESCoder.generateKey(key.toCharArray(), null);
                     byte[] data = AESCoder.decrypt(secretKey, null, encryptData);
                     return data;
@@ -86,13 +86,8 @@ public class Cipher implements ICipher {
         }
 
         private static String getPassword(Context context, String tag) {
-            String sigStr = "";
-            android.content.pm.Signature[] signatures = Util
-                    .getSignature(context.getPackageManager(), context.getPackageName());
-            if (signatures != null && signatures.length > 0) {
-                sigStr = signatures[0].toCharsString();
-            }
-            return context.getPackageName() + tag + sigStr;
+            byte[] fingerprint = Util.getFingerprint(context, tag);
+            return Util.encodeBase64(fingerprint);
         }
 
         public static byte[] initKey(Context context, String tag, SharedPreferences preference) {
@@ -110,7 +105,7 @@ public class Cipher implements ICipher {
                 throws InvalidKeySpecException, NoSuchAlgorithmException,
                 NoSuchProviderException {
             Key key = HashUtil.generateHash(password, salt, 256);
-            return Util.encode(key.getEncoded());
+            return Util.encodeBase64(key.getEncoded());
         }
 
         @TargetApi(3)

@@ -19,7 +19,7 @@ import cm.android.preference.util.Util;
 
 public class CryptoHelper {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CryptoHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger("SecurePreference");
 
     private ICipher valueCipher;
 
@@ -101,7 +101,7 @@ public class CryptoHelper {
     private <T> String encrypt(byte[] byteArray) {
         try {
             byte[] encrypt = valueCipher.encrypt(byteArray);
-            String result = Util.encode(encrypt);
+            String result = Util.encodeBase64(encrypt);
             return result;
         } catch (CryptoException e) {
             LOGGER.error("Error encoding value", e);
@@ -110,7 +110,7 @@ public class CryptoHelper {
     }
 
     private byte[] decrypt(String stringValue) throws CryptoException {
-        byte[] decodedBytes = Util.decode(stringValue);
+        byte[] decodedBytes = Util.decodeBase64(stringValue);
         byte[] decoded = valueCipher.decrypt(decodedBytes);
         return decoded;
     }
@@ -138,7 +138,7 @@ public class CryptoHelper {
         try {
             //确保返回的值固定
             byte[] encrypt = keyCipher.encrypt(keyByteArray);
-            String result = Util.encode(encrypt);
+            String result = Util.encodeBase64(encrypt);
             return result;
         } catch (CryptoException e) {
             LOGGER.error("Error encoding value", e);
@@ -150,7 +150,7 @@ public class CryptoHelper {
     }
 
     public byte[] decryptKey(String stringValue) {
-        byte[] decodedBytes = Util.decode(stringValue);
+        byte[] decodedBytes = Util.decodeBase64(stringValue);
         try {
             byte[] decoded = keyCipher.decrypt(decodedBytes);
             return decoded;

@@ -1,6 +1,10 @@
 package cm.android.preference.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
@@ -12,6 +16,8 @@ import java.util.Set;
 import cm.android.preference.SecureSharedPreferences;
 
 public final class Util {
+
+    private static final Logger logger = LoggerFactory.getLogger("SecurePreference");
 
     private static final String VERSION_KEY = "SecurePreferences_version";
 
@@ -53,13 +59,27 @@ public final class Util {
     }
 
     @TargetApi(8)
-    public static String encode(byte[] input) {
+    public static String encodeBase64(byte[] input) {
         return Base64.encodeToString(input, Base64.NO_PADDING | Base64.NO_WRAP | Base64.URL_SAFE);
     }
 
     @TargetApi(8)
-    public static byte[] decode(String input) {
+    public static byte[] decodeBase64(String input) {
         return Base64.decode(input, Base64.NO_PADDING | Base64.NO_WRAP | Base64.URL_SAFE);
+    }
+
+    public static byte[] getFingerprint(Context context, String tag) {
+        StringBuilder sb = new StringBuilder();
+        android.content.pm.Signature[] signatures = getSignature(context.getPackageManager(),
+                context.getPackageName());
+        if (signatures != null && signatures.length > 0) {
+            sb.append(signatures[0].toCharsString());
+        }
+
+        sb.append(context.getPackageName());
+        sb.append(tag);
+        byte[] fingerprint = HashUtil.getHmac(tag.getBytes(), sb.toString().getBytes());
+        return fingerprint;
     }
 
     public static android.content.pm.Signature[] getSignature(
@@ -69,7 +89,7 @@ public final class Util {
                     packageName, PackageManager.GET_SIGNATURES).signatures;
             return sigs;
         } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
