@@ -70,14 +70,13 @@ public final class Util {
 
     public static byte[] getFingerprint(Context context, String tag) {
         StringBuilder sb = new StringBuilder();
+        sb.append(tag);
+        sb.append(context.getPackageName());
+
         android.content.pm.Signature[] signatures = getSignature(context.getPackageManager(),
                 context.getPackageName());
-        if (signatures != null && signatures.length > 0) {
-            sb.append(signatures[0].toCharsString());
-        }
+        sb.append(signatures[0].toCharsString());
 
-        sb.append(context.getPackageName());
-        sb.append(tag);
         byte[] fingerprint = HashUtil.getHmac(tag.getBytes(), sb.toString().getBytes());
         return fingerprint;
     }
