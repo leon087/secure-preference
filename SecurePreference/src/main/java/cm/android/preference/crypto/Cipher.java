@@ -12,6 +12,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.spec.InvalidKeySpecException;
 
+import javax.crypto.SecretKey;
+
 import cm.android.preference.util.AESCoder;
 import cm.android.preference.util.HashUtil;
 import cm.android.preference.util.SecureUtil;
@@ -67,13 +69,15 @@ public class Cipher implements ICipher {
                 String value = preference.getString(key, null);
                 if (value == null) {
                     byte[] iv = SecureUtil.generateIv();
-                    byte[] encryptKey = AESCoder.encryptByPassword(key.toCharArray(), null, iv);
+                    SecretKey secretKey = AESCoder.generateKey(key.toCharArray(), null);
+                    byte[] encryptKey = AESCoder.encrypt(secretKey, null, iv);
                     value = Util.encode(encryptKey);
                     preference.edit().putString(key, value).commit();
                     return iv;
                 } else {
                     byte[] encryptData = Util.decode(value);
-                    byte[] data = AESCoder.decryptByPassword(key.toCharArray(), null, encryptData);
+                    SecretKey secretKey = AESCoder.generateKey(key.toCharArray(), null);
+                    byte[] data = AESCoder.decrypt(secretKey, null, encryptData);
                     return data;
                 }
             } catch (Exception e) {
