@@ -1,7 +1,9 @@
 package cm.android.preference.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.math.BigInteger;
-import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -14,6 +16,8 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public final class HashUtil {
+
+    private static final Logger logger = LoggerFactory.getLogger("codec");
 
     private HashUtil() {
     }
@@ -38,9 +42,11 @@ public final class HashUtil {
         try {
             key = generatePBEKey(password, salt, ALG_PBK, iterationCount, KEY_SIZE);
         } catch (NoSuchAlgorithmException e) {
+            logger.error(e.getMessage(), e);
             try {
                 key = generatePBEKey(password, salt, ALG_PBE_LOW, iterationCount, KEY_SIZE);
             } catch (NoSuchAlgorithmException e1) {
+                logger.error(e1.getMessage(), e1);
                 throw new RuntimeException(e1);
             }
         }
@@ -80,17 +86,22 @@ public final class HashUtil {
             final byte[] digest = md.digest(data);
             return digest;
         } catch (final NoSuchAlgorithmException e) {
+            logger.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }
 
-    public static byte[] getHmac(byte[] macKey, byte[] data)
-            throws InvalidKeyException, NoSuchAlgorithmException {
+    public static byte[] getHmac(byte[] macKey, byte[] data) {
         SecretKey secret = new SecretKeySpec(macKey, ALG_HMAC);
 
-        Mac mac = Mac.getInstance(ALG_HMAC);
-        mac.init(secret);
-        byte[] doFinal = mac.doFinal(data);
-        return doFinal;
+        try {
+            Mac mac = Mac.getInstance(ALG_HMAC);
+            mac.init(secret);
+            byte[] doFinal = mac.doFinal(data);
+            return doFinal;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return getSha(data);
+        }
     }
 }
