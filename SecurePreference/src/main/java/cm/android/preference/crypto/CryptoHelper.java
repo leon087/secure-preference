@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import cm.android.preference.util.IoUtil;
 import cm.android.preference.util.Util;
 
 public class CryptoHelper {
@@ -124,7 +123,7 @@ public class CryptoHelper {
         } catch (Exception e) {
             throw new CryptoException(e);
         } finally {
-            IoUtil.closeQuietly(ois);
+            Util.closeQuietly(ois);
         }
     }
 

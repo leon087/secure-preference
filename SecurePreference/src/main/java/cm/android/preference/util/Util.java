@@ -10,6 +10,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.util.Base64;
 
+import java.io.Closeable;
 import java.util.Map;
 import java.util.Set;
 
@@ -90,6 +91,18 @@ public final class Util {
         } catch (PackageManager.NameNotFoundException e) {
             logger.error(e.getMessage(), e);
             return null;
+        }
+    }
+
+    public static void closeQuietly(Closeable closeable) {
+        if (closeable != null) {
+            try {
+                closeable.close();
+            } catch (RuntimeException rethrown) {
+                throw rethrown;
+            } catch (Exception e) {
+                //logger.error("", e);
+            }
         }
     }
 
