@@ -8,14 +8,10 @@ import android.provider.Settings;
 import android.text.TextUtils;
 
 import java.security.Key;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.spec.InvalidKeySpecException;
 
 import javax.crypto.SecretKey;
 
 import cm.android.preference.util.AESCoder;
-import cm.android.preference.util.HashUtil;
 import cm.android.preference.util.SecureUtil;
 import cm.android.preference.util.Util;
 
@@ -62,22 +58,22 @@ public class Cipher implements ICipher {
 
         public static byte[] initIv(Context context, String tag, SharedPreferences preference) {
             char[] password = getPassword(context, tag).toCharArray();
-            final byte[] salt = getDeviceSerialNumber(context).getBytes();//
+            final byte[] salt = SecureUtil.SALT_DEF;//
 
             try {
-                final String key = generateKeyName(password, salt);
-                String value = preference.getString(key, null);
+                SecretKey aesSecretKey = AESCoder.generateKey(password, salt);
+                String keyName = Util.encodeBase64(aesSecretKey.getEncoded());
+
+                String value = preference.getString(keyName, null);
                 if (value == null) {
                     byte[] iv = SecureUtil.generateIv();
-                    SecretKey secretKey = AESCoder.generateKey(key.toCharArray(), null);
-                    byte[] encryptKey = AESCoder.encrypt(secretKey, null, iv);
+                    byte[] encryptKey = AESCoder.encrypt(aesSecretKey, null, iv);
                     value = Util.encodeBase64(encryptKey);
-                    preference.edit().putString(key, value).commit();
+                    preference.edit().putString(keyName, value).commit();
                     return iv;
                 } else {
                     byte[] encryptData = Util.decodeBase64(value);
-                    SecretKey secretKey = AESCoder.generateKey(key.toCharArray(), null);
-                    byte[] data = AESCoder.decrypt(secretKey, null, encryptData);
+                    byte[] data = AESCoder.decrypt(aesSecretKey, null, encryptData);
                     return data;
                 }
             } catch (Exception e) {
@@ -87,7 +83,8 @@ public class Cipher implements ICipher {
 
         private static String getPassword(Context context, String tag) {
             byte[] fingerprint = Util.getFingerprint(context, tag);
-            return Util.encodeBase64(fingerprint);
+            String deviceId = getDeviceSerialNumber(context);
+            return Util.encodeBase64(fingerprint) + Util.encodeBase64(deviceId.getBytes());
         }
 
         public static byte[] initKey(Context context, String tag, SharedPreferences preference) {
@@ -99,13 +96,6 @@ public class Cipher implements ICipher {
             } catch (Exception e) {
                 throw new IllegalStateException(e);
             }
-        }
-
-        private static String generateKeyName(char[] password, byte[] salt)
-                throws InvalidKeySpecException, NoSuchAlgorithmException,
-                NoSuchProviderException {
-            Key key = HashUtil.generateHash(password, salt, 256);
-            return Util.encodeBase64(key.getEncoded());
         }
 
         @TargetApi(3)
