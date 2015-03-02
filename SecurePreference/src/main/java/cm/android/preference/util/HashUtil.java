@@ -3,6 +3,9 @@ package cm.android.preference.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -32,29 +35,26 @@ public final class HashUtil {
 
     public static final String PROVIDER = "BC";
 
-    private static final int ITERATIONS = 1000;
+    private static final int ITERATIONS = 499;
 
-    private static final int KEY_SIZE = 256;
+    private static final int KEY_SIZE = 128;
 
-    public static SecretKey generateHash(char[] password, byte[] salt, int iterationCount)
-            throws InvalidKeySpecException {
-        SecretKey key;
+    public static SecretKey generateHash(char[] password, byte[] salt, int iterationCount,
+            int keyLength) throws InvalidKeySpecException {
         try {
-            key = generatePBEKey(password, salt, ALG_PBK, iterationCount, KEY_SIZE);
+            SecretKey key = generatePBEKey(password, salt, ALG_PBK, iterationCount, keyLength);
+            return key;
         } catch (NoSuchAlgorithmException e) {
             logger.error(e.getMessage(), e);
             try {
-                key = generatePBEKey(password, salt, ALG_PBE_LOW, iterationCount, KEY_SIZE);
+                SecretKey key = generatePBEKey(password, salt, ALG_PBE_LOW, iterationCount,
+                        keyLength);
+                return key;
             } catch (NoSuchAlgorithmException e1) {
                 logger.error(e1.getMessage(), e1);
                 throw new RuntimeException(e1);
             }
         }
-        return key;
-    }
-
-    public static SecretKey generateHash(char[] password) throws InvalidKeySpecException {
-        return generateHash(password, null);
     }
 
     public static SecretKey generateHash(char[] password, byte[] salt)
@@ -62,7 +62,15 @@ public final class HashUtil {
         if (null == salt) {
             salt = SecureUtil.SALT_DEF;
         }
-        return generateHash(password, salt, ITERATIONS);
+        return generateHash(password, salt, KEY_SIZE);
+    }
+
+    public static SecretKey generateHash(char[] password, byte[] salt, int keyLength)
+            throws InvalidKeySpecException {
+        if (null == salt) {
+            salt = SecureUtil.SALT_DEF;
+        }
+        return generateHash(password, salt, ITERATIONS, keyLength);
     }
 
     private static SecretKey generatePBEKey(char[] password, byte[] salt, String algorthm,
@@ -104,4 +112,38 @@ public final class HashUtil {
             return getSha(data);
         }
     }
+
+    public static byte[] getSha(InputStream inputStream) throws IOException {
+        InputStream is = new BufferedInputStream(inputStream);
+
+        try {
+            final MessageDigest md = MessageDigest.getInstance(ALG_SHA);
+
+            byte[] buffer = new byte[2048];
+            int sizeRead = -1;
+            while ((sizeRead = is.read(buffer)) != -1) {
+                md.update(buffer, 0, sizeRead);
+            }
+
+            final byte[] digest = md.digest();
+            return digest;
+        } catch (final NoSuchAlgorithmException e) {
+            logger.error(e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
+    }
+
+//    public static byte[] getHmac(byte[] macKey, InputStream is) {
+//        SecretKey secret = new SecretKeySpec(macKey, ALG_HMAC);
+//
+//        try {
+//            Mac mac = Mac.getInstance(ALG_HMAC);
+//            mac.init(secret);
+//            byte[] doFinal = mac.doFinal(data);
+//            return doFinal;
+//        } catch (Exception e) {
+//            logger.error(e.getMessage(), e);
+//            return getSha(data);
+//        }
+//    }
 }
