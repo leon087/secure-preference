@@ -57,11 +57,12 @@ public class Cipher implements ICipher {
     public static class KeyHelper {
 
         public static byte[] initIv(Context context, String tag, SharedPreferences preference) {
-            char[] password = getPassword(context, tag).toCharArray();
+            String password = getPassword(context, tag);
             final byte[] salt = SecureUtil.SALT_DEF;//
 
             try {
-                SecretKey aesSecretKey = AESCoder.generateKey(password, salt);
+                SecretKey aesSecretKey = AESCoder.generateKey(password.getBytes());
+//                SecretKey aesSecretKey = AESCoder.generateKey(password, salt);
                 String keyName = Util.encodeBase64(aesSecretKey.getEncoded());
 
                 String value = preference.getString(keyName, null);
@@ -88,10 +89,10 @@ public class Cipher implements ICipher {
         }
 
         public static byte[] initKey(Context context, String tag, SharedPreferences preference) {
-            final char[] password = getPassword(context, tag).toCharArray();
+            final String password = getPassword(context, tag);
 
             try {
-                Key key = AESCoder.generateKey(password, null);
+                Key key = AESCoder.generateKey(password.getBytes());
                 return key.getEncoded();
             } catch (Exception e) {
                 throw new IllegalStateException(e);

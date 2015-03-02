@@ -38,20 +38,31 @@ public final class AESCoder {
     }
 
     public static SecretKey generateKey(char[] password, byte[] salt)
-            throws NoSuchAlgorithmException, InvalidKeySpecException {
+            throws InvalidKeySpecException {
         SecretKey tmp = HashUtil.generateHash(password, salt);
-        SecretKey secret = new SecretKeySpec(tmp.getEncoded(), C_AES_CBC_PKCS5PADDING);
+        SecretKey secret = getSecretKey(tmp.getEncoded());
+        return secret;
+    }
+
+    public static SecretKey generateKey(byte[] key) {
+        byte[] tmp = HashUtil.getSha(key);
+        SecretKey secret = getSecretKey(tmp);
+        return secret;
+    }
+
+    private static SecretKey getSecretKey(byte[] key) {
+        SecretKey secret = new SecretKeySpec(key, C_AES_CBC_PKCS5PADDING);
         return secret;
     }
 
     public static byte[] encrypt(byte[] key, byte[] iv, byte[] src) throws Exception {
-        SecretKeySpec skeySpec = new SecretKeySpec(key, C_AES_CBC_PKCS5PADDING);
-        return encrypt(skeySpec, iv, src);
+        SecretKey secret = getSecretKey(key);
+        return encrypt(secret, iv, src);
     }
 
     public static byte[] decrypt(byte[] key, byte[] iv, byte[] encrypted) throws Exception {
-        SecretKeySpec skeySpec = new SecretKeySpec(key, C_AES_CBC_PKCS5PADDING);
-        return decrypt(skeySpec, iv, encrypted);
+        SecretKey secret = getSecretKey(key);
+        return decrypt(secret, iv, encrypted);
     }
 
     public static byte[] encrypt(SecretKey secretKey, byte[] iv, byte[] src) throws Exception {
