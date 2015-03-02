@@ -82,9 +82,9 @@ public class Cipher implements ICipher {
         }
 
         private static String getPassword(Context context, String tag) {
-            byte[] fingerprint = Util.getFingerprint(context, tag);
             String deviceId = getDeviceSerialNumber(context);
-            return Util.encodeBase64(fingerprint) + Util.encodeBase64(deviceId.getBytes());
+            byte[] fingerprint = Util.getFingerprint(context, tag + deviceId);
+            return Util.encodeBase64(fingerprint);
         }
 
         public static byte[] initKey(Context context, String tag, SharedPreferences preference) {
