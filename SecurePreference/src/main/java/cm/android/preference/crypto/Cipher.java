@@ -57,20 +57,20 @@ public class Cipher implements ICipher {
     public static class KeyHelper {
 
         public static byte[] initIv(Context context, String tag, SharedPreferences preference) {
-            String password = getPassword(context, tag);
+            String password = getPassword(context, tag) + "_iv";
             final byte[] salt = SecureUtil.SALT_DEF;//
 
             try {
                 SecretKey aesSecretKey = AESCoder.generateKey(password.getBytes());
 //                SecretKey aesSecretKey = AESCoder.generateKey(password, salt);
-                String keyName = Util.encodeBase64(aesSecretKey.getEncoded());
+                String ivName = Util.encodeBase64(aesSecretKey.getEncoded());
 
-                String value = preference.getString(keyName, null);
+                String value = preference.getString(ivName, null);
                 if (value == null) {
                     byte[] iv = SecureUtil.generateIv();
                     byte[] encryptKey = AESCoder.encrypt(aesSecretKey, null, iv);
                     value = Util.encodeBase64(encryptKey);
-                    preference.edit().putString(keyName, value).commit();
+                    preference.edit().putString(ivName, value).commit();
                     return iv;
                 } else {
                     byte[] encryptData = Util.decodeBase64(value);

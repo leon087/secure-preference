@@ -25,16 +25,10 @@ public final class AESCoder {
         // Do *not* seed secureRandom! Automatically seeded from system entropy
         final SecureRandom random = new SecureRandom();
 
-        // Use the largest AES key length which is supported by the OS
         final KeyGenerator generator = KeyGenerator.getInstance(KEY_ALGORITHM);
-        try {
-            generator.init(KEY_SIZE, random);
-        } catch (Exception e) {
-            generator.init(128, random);
-        }
+        generator.init(KEY_SIZE, random);
 
         return generator.generateKey();
-        //return SecureUtil.encode(generator.generateKey().getEncoded());
     }
 
     public static SecretKey generateKey(char[] password, byte[] salt)
