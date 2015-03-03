@@ -43,7 +43,7 @@ public final class AESCoder {
     }
 
     private static SecretKey getSecretKey(byte[] key) {
-        SecretKey secret = new SecretKeySpec(key, C_AES_CBC_PKCS5PADDING);
+        SecretKey secret = new SecretKeySpec(key, KEY_ALGORITHM);
         return secret;
     }
 
