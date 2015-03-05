@@ -11,11 +11,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 
-import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
 
 public final class HashUtil {
 
@@ -27,8 +25,6 @@ public final class HashUtil {
     private static final String ALG_PBK = "PBKDF2WithHmacSHA1";
 
     private static final String ALG_PBE_LOW = "PBEWithMD5AndDES";
-
-    public static final String ALG_HMAC = "HmacSHA256";
 
     public static final String ALG_SHA = "SHA-256";
 
@@ -90,20 +86,6 @@ public final class HashUtil {
 
     public static byte[] getSha(final byte[] data) {
         return getMessageDigest(data, ALG_SHA);
-    }
-
-    public static byte[] getHmac(byte[] macKey, byte[] data) {
-        SecretKey secret = new SecretKeySpec(macKey, ALG_HMAC);
-
-        try {
-            Mac mac = Mac.getInstance(ALG_HMAC);
-            mac.init(secret);
-            byte[] doFinal = mac.doFinal(data);
-            return doFinal;
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            return getSha(data);
-        }
     }
 
 //    public static String getMd5(InputStream inputStream) throws IOException {
