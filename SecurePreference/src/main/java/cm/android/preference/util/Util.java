@@ -84,7 +84,7 @@ public final class Util {
             sb.append(signatures[0].toCharsString());
         }
 
-        byte[] fingerprint = MacCoder.getHmac(tag.getBytes(), sb.toString().getBytes());
+        byte[] fingerprint = HashUtil.getHmac(tag.getBytes(), sb.toString().getBytes());
         return fingerprint;
     }
 
