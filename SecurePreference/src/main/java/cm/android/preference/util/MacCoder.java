@@ -23,7 +23,9 @@ public class MacCoder {
     }
 
     public static byte[] getHmac(byte[] macKey, byte[] data) {
-        SecretKey secret = new SecretKeySpec(macKey, ALG_HMAC);
+        byte[] key = HashUtil.getSha(macKey);
+
+        SecretKey secret = new SecretKeySpec(key, ALG_HMAC);
 
         try {
             Mac mac = Mac.getInstance(ALG_HMAC);
