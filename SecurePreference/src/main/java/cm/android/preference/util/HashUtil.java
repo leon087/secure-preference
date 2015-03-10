@@ -22,6 +22,8 @@ public final class HashUtil {
 
     private static final Logger logger = LoggerFactory.getLogger("codec");
 
+    private static final int BUF_SIZE = 1024;
+
     private HashUtil() {
     }
 
@@ -120,7 +122,7 @@ public final class HashUtil {
         try {
             final MessageDigest md = MessageDigest.getInstance(algorithm);
 
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[BUF_SIZE];
             int sizeRead = -1;
             while ((sizeRead = is.read(buffer)) != -1) {
                 md.update(buffer, 0, sizeRead);
@@ -144,7 +146,7 @@ public final class HashUtil {
             Mac mac = Mac.getInstance(ALG_HMAC);
             mac.init(secret);
 
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[BUF_SIZE];
             int sizeRead = -1;
             while ((sizeRead = is.read(buffer)) != -1) {
                 mac.update(buffer, 0, sizeRead);
