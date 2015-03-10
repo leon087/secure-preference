@@ -68,8 +68,8 @@ public class Cipher implements ICipher {
                 String value = preference.getString(ivName, null);
                 if (value == null) {
                     byte[] iv = SecureUtil.generateIv();
-                    byte[] encryptKey = AESCoder.encrypt(aesSecretKey, null, iv);
-                    value = Util.encodeBase64(encryptKey);
+                    byte[] encryptData = AESCoder.encrypt(aesSecretKey, null, iv);
+                    value = Util.encodeBase64(encryptData);
                     preference.edit().putString(ivName, value).commit();
                     return iv;
                 } else {
