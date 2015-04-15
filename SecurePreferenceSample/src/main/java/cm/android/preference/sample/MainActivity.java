@@ -41,7 +41,8 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void refresh() {
-        SharedPreferences preferences = PreferenceFactory.getPreferences(this, "test_pref_1");
+        SharedPreferences preferences = PreferenceFactory
+                .getPreferences(this, "test_pref_1", "111");
 
         SharedPreferences.Editor editor = preferences.edit();
         String key = "ggg_key_str" + new Random().nextInt(100);
@@ -59,7 +60,8 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void refresh2() {
-        SharedPreferences preferences = PreferenceFactory.getPreferences(this, "test_pref_2");
+        SharedPreferences preferences = PreferenceFactory
+                .getPreferences(this, "test_pref_2", "111");
 
         SharedPreferences.Editor editor = preferences.edit();
         String key = "ggg_key_str" + new Random().nextInt(100);

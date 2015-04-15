@@ -12,8 +12,6 @@ import cm.android.preference.util.Util;
 
 public final class PreferenceFactory {
 
-    private static final String INITIALIZATION_ERROR = "Can not initialize SecureSharedPreferences";
-
     public static final int VERSION_1 = 1;
 
     public static final int LATEST_VERSION = VERSION_1;
@@ -45,13 +43,16 @@ public final class PreferenceFactory {
         return getPreferences(preference, keyCipher, valueCipher);
     }
 
-    public static SecureSharedPreferences getPreferences(Context context, String preferencesName) {
-        SharedPreferences preference = context
-                .getSharedPreferences(preferencesName, Context.MODE_PRIVATE);
+    public static SecureSharedPreferences getPreferences(Context context, String preferencesName,
+            String password) {
+        SharedPreferences preference = context.getSharedPreferences(preferencesName,
+                Context.MODE_PRIVATE);
+
+        String tag = preferencesName + password;
         ICipher cipher = new Cipher();
-        byte[] key = Cipher.KeyHelper.initKey(context, preferencesName, preference);
-        byte[] iv = Cipher.KeyHelper.initIv(context, preferencesName, preference);
-        cipher.initKey(key, iv, preferencesName);
+        byte[] key = Cipher.KeyHelper.initKey(context, tag, preference);
+        byte[] iv = Cipher.KeyHelper.initIv(context, tag, preference);
+        cipher.initKey(key, iv, tag);
 
         return getPreferences(preference, cipher, cipher);
     }
