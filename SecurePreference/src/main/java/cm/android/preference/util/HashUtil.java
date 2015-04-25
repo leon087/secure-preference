@@ -22,7 +22,7 @@ public final class HashUtil {
 
     private static final Logger logger = LoggerFactory.getLogger("codec");
 
-    private static final int BUF_SIZE = 1024;
+    private static final int BUF_SIZE = 8 * 1024;
 
     private HashUtil() {
     }
