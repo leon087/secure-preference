@@ -136,10 +136,9 @@ public final class HashUtil {
         }
     }
 
-    public static byte[] getHmac(byte[] key, InputStream inputStream) throws IOException {
+    public static byte[] getHmac(byte[] macKey, InputStream inputStream) throws IOException {
         InputStream is = new BufferedInputStream(inputStream);
 
-        byte[] macKey = HashUtil.getSha(key);
         SecretKey secret = new SecretKeySpec(macKey, ALG_HMAC);
 
         try {
@@ -164,9 +163,7 @@ public final class HashUtil {
     }
 
     public static byte[] getHmac(byte[] macKey, byte[] data) {
-        byte[] key = HashUtil.getSha(macKey);
-
-        SecretKey secret = new SecretKeySpec(key, ALG_HMAC);
+        SecretKey secret = new SecretKeySpec(macKey, ALG_HMAC);
 
         try {
             Mac mac = Mac.getInstance(ALG_HMAC);
