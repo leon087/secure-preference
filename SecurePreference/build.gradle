@@ -1,7 +1,7 @@
 tasks.withType(JavaCompile) { options.encoding = "UTF-8" }
 
 apply plugin: 'com.android.library'
-apply from: '../../ext-android.gradle'
+apply from: '../ext-android.gradle'
 
 android {
 
