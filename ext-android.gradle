@@ -1,0 +1,79 @@
+def computeVersionName() {
+    return project.versionName + "." + buildTime()
+}
+
+def buildTime() {
+    def date = new Date()
+    def formattedDate = date.format('MMddHH')
+    return formattedDate
+}
+
+def isWindows() {
+    String osName = System.getProperty("os.name").toLowerCase();
+    if (osName.indexOf("windows") >= 0) {
+        return true;
+    }
+    return false;
+}
+
+if (plugins.hasPlugin('com.android.application') || plugins.hasPlugin('com.android.library')) {
+    android {
+        compileSdkVersion Integer.parseInt(project.compileSdkVersion)
+        buildToolsVersion project.buildToolsVersion
+
+        compileOptions {
+            sourceCompatibility JavaVersion.VERSION_1_7
+            targetCompatibility JavaVersion.VERSION_1_7
+        }
+
+        defaultConfig {
+            minSdkVersion Integer.parseInt(project.minSdkVersion)
+            targetSdkVersion Integer.parseInt(project.targetSdkVersion)
+            versionCode Integer.parseInt(project.versionCode)
+            versionName computeVersionName()
+        }
+    }
+
+    android {
+        packagingOptions {
+//        pickFirst 'META-INF/foo.txt'
+
+            exclude 'META-INF/DEPENDENCIES.txt'
+            exclude 'META-INF/LICENSE.txt'
+            exclude 'META-INF/NOTICE.txt'
+            exclude 'LICENSE.txt'
+            exclude 'META-INF/LICENSE'
+            exclude 'META-INF/license.txt'
+            exclude 'META-INF/NOTICE'
+            exclude 'META-INF/notice.txt'
+            exclude 'META-INF/ASL2.0'
+        }
+
+        lintOptions {
+            abortOnError false
+            quiet false
+            showAll true
+        }
+
+        dexOptions { preDexLibraries = false }
+    }
+}
+
+if (plugins.hasPlugin('com.android.library')) {
+    android.libraryVariants.all { variant ->
+        def name = variant.buildType.name
+        def task = project.tasks.create "jar${name.capitalize()}", Jar
+        task.dependsOn variant.javaCompile
+        task.from variant.javaCompile.destinationDir
+        artifacts.add('archives', task);
+    }
+
+    task androidSourcesJar(type: Jar) {
+        classifier = 'sources'
+        from android.sourceSets.main.java.srcDirs
+    }
+
+    artifacts {
+        archives androidSourcesJar
+    }
+}
