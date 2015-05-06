@@ -51,4 +51,12 @@ public final class SecureUtil {
             }
         }
     }
+
+
+    /**
+     * 将字节长度转换位位长度
+     */
+    public static final int convertSize(int keySize) {
+        return keySize * 8;
+    }
 }

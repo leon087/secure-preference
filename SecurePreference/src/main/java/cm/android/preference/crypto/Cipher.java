@@ -61,7 +61,7 @@ public class Cipher implements ICipher {
             final byte[] salt = SecureUtil.SALT_DEF;//
 
             try {
-                SecretKey aesSecretKey = AESCoder.generateKey(password.toCharArray(), salt, 128);
+                SecretKey aesSecretKey = AESCoder.generateKey(password.toCharArray(), salt, 16);
 //                SecretKey aesSecretKey = AESCoder.generateKey(password, salt);
                 String ivName = Util.encodeBase64(aesSecretKey.getEncoded());
 
@@ -92,7 +92,7 @@ public class Cipher implements ICipher {
             final String password = getPassword(context, tag);
 
             try {
-                Key key = AESCoder.generateKey(password.toCharArray(), null, 128);
+                Key key = AESCoder.generateKey(password.toCharArray(), null, 16);
                 return key.getEncoded();
             } catch (Exception e) {
                 throw new IllegalStateException(e);
