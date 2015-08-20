@@ -88,18 +88,24 @@ public final class HashUtil {
         return secretKey;
     }
 
-//    public static String getSha256(final byte[] data) {
+//    /**
+//     * 返回小写形式16进制编码的sha256
+//     */
+//    public static String getShaHex(final byte[] data) {
 //        final byte[] digest = getSha(data);
-//        return HexUtil.encode(digest);
+//        return HexUtil.encode(digest).toLowerCase();
 //    }
 
     public static byte[] getSha(final byte[] data) {
         return getMessageDigest(data, ALG_SHA);
     }
 
+//    /**
+//     * 返回小写形式16进制编码的md5
+//     */
 //    public static String getMd5(InputStream inputStream) throws IOException {
 //        byte[] data = getMessageDigest(inputStream, ALG_MD5);
-//        return HexUtil.encode(data);
+//        return HexUtil.encode(data).toLowerCase();
 //    }
 
     public static byte[] getSha(InputStream inputStream) throws IOException {
@@ -113,7 +119,8 @@ public final class HashUtil {
             return digest;
         } catch (final NoSuchAlgorithmException e) {
             logger.error(e.getMessage(), e);
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
+            return new byte[]{0x0};
         }
     }
 
@@ -134,7 +141,8 @@ public final class HashUtil {
             return digest;
         } catch (final NoSuchAlgorithmException e) {
             logger.error(e.getMessage(), e);
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
+            return new byte[]{0x0};
         }
     }
 

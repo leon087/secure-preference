@@ -12,14 +12,24 @@ import cm.android.preference.crypto.ICipher;
 
 public class SecureSharedPreferences implements SharedPreferences {
 
+    private static final String VERSION_KEY = "SecureSharedPreferences_version";
+
     private SharedPreferences prefs;
 
     private CryptoHelper helper;
 
-    public SecureSharedPreferences(SharedPreferences preferences, ICipher keyCipher,
+    public SecureSharedPreferences(SharedPreferences original, ICipher keyCipher,
             ICipher valueCipher) {
-        this.prefs = preferences;
+        this.prefs = original;
         helper = new CryptoHelper(keyCipher, valueCipher);
+    }
+
+    public void setVersion(int version) {
+        this.prefs.edit().putInt(VERSION_KEY, version).apply();
+    }
+
+    public int getVersion() {
+        return this.prefs.getInt(VERSION_KEY, -1);
     }
 
     @Override

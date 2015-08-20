@@ -1,5 +1,8 @@
 package cm.android.preference.crypto;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -7,15 +10,20 @@ import android.os.Build;
 import android.provider.Settings;
 import android.text.TextUtils;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.security.Key;
-
-import javax.crypto.SecretKey;
+import java.util.Properties;
 
 import cm.android.preference.util.AESCoder;
 import cm.android.preference.util.SecureUtil;
 import cm.android.preference.util.Util;
 
 public class Cipher implements ICipher {
+
+    private static final Logger logger = LoggerFactory.getLogger("SecurePreference");
 
     private byte[] key;
 
@@ -54,29 +62,114 @@ public class Cipher implements ICipher {
         }
     }
 
+    private static class IvHolder {
+
+        private static final String FILE_NAME_CACHE = "SecurePreference_cache";
+
+        private static void write(Context context, String ivName, String iv) {
+            logger.info("writeState:state = " + iv);
+
+            File file = new File(context.getCacheDir(), FILE_NAME_CACHE);
+            Properties properties = Util.loadProperties(file);
+            properties.setProperty(ivName, iv);
+
+            OutputStream os = null;
+            try {
+                os = new FileOutputStream(file);
+                properties.store(os, "write:ivName = " + ivName);
+            } catch (IOException e) {
+                logger.error(e.getMessage(), e);
+            } finally {
+                Util.closeQuietly(os);
+            }
+        }
+
+        private static String read(Context context, String ivName) {
+            File file = new File(context.getCacheDir(), FILE_NAME_CACHE);
+            Properties properties = Util.loadProperties(file);
+            String iv = properties.getProperty(ivName, null);
+
+            logger.info("read:ivName = " + ivName);
+            return iv;
+        }
+
+        public static void clear(Context context) {
+            File file = new File(context.getCacheDir(), FILE_NAME_CACHE);
+            file.delete();
+        }
+
+        public static void writeIv(Context context, SharedPreferences original, String ivName,
+                String value) {
+            original.edit().putString(ivName, value).apply();
+            write(context, ivName, value);
+        }
+
+        public static String readIv(Context context, SharedPreferences original, String ivName) {
+            String value = original.getString(ivName, null);
+            if (!TextUtils.isEmpty(value)) {
+                clear(context);
+                return value;
+            }
+
+            String data = read(context, ivName);
+            return data;
+        }
+    }
+
     public static class KeyHelper {
 
-        public static byte[] initIv(Context context, String tag, SharedPreferences preference) {
-            String password = getPassword(context, tag) + "_iv";
-            final byte[] salt = SecureUtil.SALT_DEF;//
+        public static ICipher initKeyCipher(Context context, String tag,
+                ICipher valueCipher, SharedPreferences original) {
+            byte[] key = generateKey(context, tag);
+            ICipher keyCipher = new Cipher();
+            keyCipher.initKey(key, SecureUtil.IV_DEF, tag);
 
             try {
-                SecretKey aesSecretKey = AESCoder.generateKey(password.toCharArray(), salt, 16);
-//                SecretKey aesSecretKey = AESCoder.generateKey(password, salt);
-                String ivName = Util.encodeBase64(aesSecretKey.getEncoded());
+//                byte[] keyValue = AESCoder.encrypt(key, SecureUtil.IV_DEF, tag.getBytes());
+                byte[] keyValue = keyCipher.encrypt(tag.getBytes());
+                String ivName = Util.encodeBase64(keyValue);
+                byte[] iv = initIv(context, ivName, valueCipher, original);
 
-                String value = preference.getString(ivName, null);
-                if (value == null) {
-                    byte[] iv = SecureUtil.generateIv();
-                    byte[] encryptData = AESCoder.encrypt(aesSecretKey, null, iv);
-                    value = Util.encodeBase64(encryptData);
-                    preference.edit().putString(ivName, value).commit();
-                    return iv;
-                } else {
-                    byte[] encryptData = Util.decodeBase64(value);
-                    byte[] data = AESCoder.decrypt(aesSecretKey, null, encryptData);
-                    return data;
-                }
+                keyCipher.initKey(key, iv, tag);
+                return keyCipher;
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+        }
+
+        private static byte[] initIv(Context context, String ivName, ICipher valueCipher,
+                SharedPreferences original) throws CryptoException {
+            String value = IvHolder.readIv(context, original, ivName);
+
+            byte[] iv;
+            if (value == null) {
+                iv = SecureUtil.generateIv();
+                byte[] encryptData = valueCipher.encrypt(iv);
+                value = Util.encodeBase64(encryptData);
+                IvHolder.writeIv(context, original, ivName, value);
+            } else {
+                byte[] encryptData = Util.decodeBase64(value);
+                iv = valueCipher.decrypt(encryptData);
+            }
+
+            return iv;
+        }
+
+        public static ICipher initCipher(Context context, String tag) {
+            ICipher cipher = new Cipher();
+            byte[] key = Cipher.KeyHelper.generateKey(context, tag);
+            byte[] iv = SecureUtil.IV_DEF;
+            cipher.initKey(key, iv, tag);
+
+            return cipher;
+        }
+
+        private static byte[] generateKey(Context context, String tag) {
+            final String password = getPassword(context, tag);
+
+            try {
+                Key key = AESCoder.generateKey(password.toCharArray(), null, 16);
+                return key.getEncoded();
             } catch (Exception e) {
                 throw new IllegalStateException(e);
             }
@@ -88,16 +181,16 @@ public class Cipher implements ICipher {
             return Util.encodeBase64(fingerprint);
         }
 
-        public static byte[] initKey(Context context, String tag, SharedPreferences preference) {
-            final String password = getPassword(context, tag);
-
-            try {
-                Key key = AESCoder.generateKey(password.toCharArray(), null, 16);
-                return key.getEncoded();
-            } catch (Exception e) {
-                throw new IllegalStateException(e);
-            }
-        }
+//        public static byte[] initKey(Context context, String tag, SharedPreferences preference) {
+//            final String password = getPassword(context, tag);
+//
+//            try {
+//                Key key = AESCoder.generateKey(password.toCharArray(), null, 16);
+//                return key.getEncoded();
+//            } catch (Exception e) {
+//                throw new IllegalStateException(e);
+//            }
+//        }
 
         @TargetApi(3)
         private static String getDeviceSerialNumber(Context context) {

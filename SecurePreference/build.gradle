@@ -1,10 +1,10 @@
 tasks.withType(JavaCompile) { options.encoding = "UTF-8" }
 
 apply plugin: 'com.android.library'
-apply from: '../ext-android.gradle'
+//apply from: '../../ext-android.gradle'
+apply from: "$rootDir/ext-android.gradle"
 
 android {
-
     buildTypes {
         release {
             shrinkResources true
@@ -17,6 +17,11 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    //log
+    compile 'com.github.tony19:logback-android-classic:1.1.1-4'
+    compile 'com.github.tony19:logback-android-core:1.1.1-4'
+    compile 'org.slf4j:slf4j-api:1.7.12'
 }
 
 version = project.versionName

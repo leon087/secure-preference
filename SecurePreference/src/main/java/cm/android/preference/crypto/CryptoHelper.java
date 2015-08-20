@@ -48,6 +48,7 @@ public class CryptoHelper {
 
     public <T> void putValue(SharedPreferences.Editor editor, String key, T value) {
         String keyEncrypt = encryptKey(key.getBytes());
+
         String valueEncrypt = encode(value);
         editor.putString(keyEncrypt, valueEncrypt);
     }
