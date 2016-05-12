@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Properties;
 
 public final class Util {
@@ -89,7 +90,7 @@ public final class Util {
             sb.append(signatures[0].toCharsString());
         }
 
-        byte[] fingerprint = HashUtil.getHmac(tag.getBytes(), sb.toString().getBytes());
+        byte[] fingerprint = HashUtil.getHmac(tag.getBytes(Charset.defaultCharset()), sb.toString().getBytes(Charset.defaultCharset()));
         return fingerprint;
     }
 

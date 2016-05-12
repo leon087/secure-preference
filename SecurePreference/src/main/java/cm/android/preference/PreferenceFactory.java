@@ -37,7 +37,7 @@ public final class PreferenceFactory {
 //    }
 
     public static SecureSharedPreferences getPreferences(Context context, String preferencesName,
-            String password) {
+                                                         String password) {
         String tag = preferencesName + password;
         ICipher valueCipher = Cipher.KeyHelper.initCipher(context, tag);
 
@@ -47,7 +47,7 @@ public final class PreferenceFactory {
     }
 
     public static SecureSharedPreferences getPreferences(Context context, String tag, int version,
-            ICipher valueCipher, SharedPreferences original) {
+                                                         ICipher valueCipher, SharedPreferences original) {
         Util.checkVersion(original, version);
 
         ICipher keyCipher = Cipher.KeyHelper.initKeyCipher(context, tag, valueCipher, original);

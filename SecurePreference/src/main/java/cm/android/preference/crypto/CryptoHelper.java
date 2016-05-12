@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -31,7 +32,7 @@ public class CryptoHelper {
 
     @SuppressWarnings("unchecked")
     public <T> T getValue(SharedPreferences prefs, String key, T defValue) {
-        String keyEncrypt = encryptKey(key.getBytes());
+        String keyEncrypt = encryptKey(key.getBytes(Charset.defaultCharset()));
         String stringValue = prefs.getString(keyEncrypt, null);
         if (stringValue == null) {
             return defValue;
@@ -47,14 +48,14 @@ public class CryptoHelper {
     }
 
     public <T> void putValue(SharedPreferences.Editor editor, String key, T value) {
-        String keyEncrypt = encryptKey(key.getBytes());
+        String keyEncrypt = encryptKey(key.getBytes(Charset.defaultCharset()));
 
         String valueEncrypt = encode(value);
         editor.putString(keyEncrypt, valueEncrypt);
     }
 
     public void remove(SharedPreferences.Editor editor, String key) {
-        String keyEncrypt = encryptKey(key.getBytes());
+        String keyEncrypt = encryptKey(key.getBytes(Charset.defaultCharset()));
         editor.remove(keyEncrypt);
     }
 
@@ -71,7 +72,7 @@ public class CryptoHelper {
                     continue;
                 }
 
-                String key = new String(keyBytes);
+                String key = new String(keyBytes, Charset.defaultCharset());
                 Object value = readDecoded((String) entry.getValue());
                 decryptedMap.put(key, value);
             } catch (CryptoException e) {
@@ -105,7 +106,7 @@ public class CryptoHelper {
             return result;
         } catch (CryptoException e) {
             LOGGER.error("Error encoding value", e);
-            return new String(byteArray);
+            return new String(byteArray, Charset.defaultCharset());
         }
     }
 
@@ -130,7 +131,7 @@ public class CryptoHelper {
 
 
     public boolean contains(SharedPreferences preference, String key) {
-        String keyEncrypt = encryptKey(key.getBytes());
+        String keyEncrypt = encryptKey(key.getBytes(Charset.defaultCharset()));
         return preference.contains(keyEncrypt);
     }
 
@@ -142,11 +143,10 @@ public class CryptoHelper {
             return result;
         } catch (CryptoException e) {
             LOGGER.error("Error encoding value", e);
-            return new String(keyByteArray);
         } catch (Exception e) {
             LOGGER.error("Error encoding value", e);
-            return new String(keyByteArray);
         }
+        return new String(keyByteArray, Charset.defaultCharset());
     }
 
     public byte[] decryptKey(String stringValue) {

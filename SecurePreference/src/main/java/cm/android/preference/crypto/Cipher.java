@@ -14,7 +14,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.security.Key;
+import java.util.Arrays;
 import java.util.Properties;
 
 import cm.android.preference.util.AESCoder;
@@ -34,8 +36,8 @@ public class Cipher implements ICipher {
 
     @Override
     public void initKey(byte[] key, byte[] iv, String tag) {
-        this.key = key;
-        this.iv = iv;
+        this.key = Arrays.copyOf(key, key.length);
+        this.iv = Arrays.copyOf(iv, iv.length);
     }
 
     @Override
@@ -95,11 +97,13 @@ public class Cipher implements ICipher {
 
         public static void clear(Context context) {
             File file = new File(context.getCacheDir(), FILE_NAME_CACHE);
-            file.delete();
+            boolean delete = file.delete();
+            if (!delete) {
+                logger.error("delete = false:file = {}", file.getAbsolutePath());
+            }
         }
 
-        public static void writeIv(Context context, SharedPreferences original, String ivName,
-                String value) {
+        public static void writeIv(Context context, SharedPreferences original, String ivName, String value) {
             original.edit().putString(ivName, value).apply();
             write(context, ivName, value);
         }
@@ -119,14 +123,14 @@ public class Cipher implements ICipher {
     public static class KeyHelper {
 
         public static ICipher initKeyCipher(Context context, String tag,
-                ICipher valueCipher, SharedPreferences original) {
+                                            ICipher valueCipher, SharedPreferences original) {
             byte[] key = generateKey(context, tag);
             ICipher keyCipher = new Cipher();
-            keyCipher.initKey(key, SecureUtil.IV_DEF, tag);
+            keyCipher.initKey(key, SecureUtil.getIvDef(), tag);
 
             try {
 //                byte[] keyValue = AESCoder.encrypt(key, SecureUtil.IV_DEF, tag.getBytes());
-                byte[] keyValue = keyCipher.encrypt(tag.getBytes());
+                byte[] keyValue = keyCipher.encrypt(tag.getBytes(Charset.defaultCharset()));
                 String ivName = Util.encodeBase64(keyValue);
                 byte[] iv = initIv(context, ivName, valueCipher, original);
 
@@ -138,7 +142,7 @@ public class Cipher implements ICipher {
         }
 
         private static byte[] initIv(Context context, String ivName, ICipher valueCipher,
-                SharedPreferences original) throws CryptoException {
+                                     SharedPreferences original) throws CryptoException {
             String value = IvHolder.readIv(context, original, ivName);
 
             byte[] iv;
@@ -158,7 +162,7 @@ public class Cipher implements ICipher {
         public static ICipher initCipher(Context context, String tag) {
             ICipher cipher = new Cipher();
             byte[] key = Cipher.KeyHelper.generateKey(context, tag);
-            byte[] iv = SecureUtil.IV_DEF;
+            byte[] iv = SecureUtil.getIvDef();
             cipher.initKey(key, iv, tag);
 
             return cipher;
@@ -194,22 +198,18 @@ public class Cipher implements ICipher {
 
         @TargetApi(3)
         private static String getDeviceSerialNumber(Context context) {
-            // We're using the Reflection API because Build.SERIAL is only available
-            // since API Level 9 (Gingerbread, Android 2.3).
+            String deviceSerial = "";
             try {
-                String deviceSerial = (String) Build.class.getField("SERIAL").get(
-                        null);
-                if (TextUtils.isEmpty(deviceSerial)) {
-                    deviceSerial = Settings.Secure.getString(
-                            context.getContentResolver(),
-                            Settings.Secure.ANDROID_ID);
-                }
-                return deviceSerial;
-            } catch (Exception ignored) {
-                // default to Android_ID
-                return Settings.Secure.getString(context.getContentResolver(),
-                        Settings.Secure.ANDROID_ID);
+                deviceSerial = (String) Build.class.getField("SERIAL").get(null);
+            } catch (NoSuchFieldException e) {
+                logger.error(e.getMessage(), e);
+            } catch (IllegalAccessException e) {
+                logger.error(e.getMessage(), e);
             }
+            if (TextUtils.isEmpty(deviceSerial)) {
+                deviceSerial = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+            }
+            return deviceSerial;
         }
     }
 }

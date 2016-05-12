@@ -1,5 +1,7 @@
 package cm.android.preference.util;
 
+import android.annotation.TargetApi;
+
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
@@ -17,6 +19,13 @@ public final class AESCoder {
     public static final String ALG_AES = "AES";
 
     public static final String C_AES_CBC_PKCS5PADDING = "AES/CBC/PKCS5Padding";
+
+    public static final String C_AES_GCM = "AES/GCM/NoPadding";
+
+    /**
+     * BouncyCastleProvider
+     */
+    public static final String PROVIDER_BC = "BC";
 
     private AESCoder() {
     }
@@ -43,7 +52,7 @@ public final class AESCoder {
         return secret;
     }
 
-    private static SecretKey getSecretKey(byte[] key) {
+    public static SecretKey getSecretKey(byte[] key) {
         SecretKey secret = new SecretKeySpec(key, ALG_AES);
         return secret;
     }
@@ -67,13 +76,47 @@ public final class AESCoder {
         return encrypted;
     }
 
-    public static byte[] decrypt(SecretKey secretKey, byte[] iv, byte[] encrypted)
+    public static byte[] decrypt(SecretKey secretKey, byte[] iv, byte[] src)
             throws Exception {
         IvParameterSpec ivSpec = SecureUtil.getIv(iv);
 
         Cipher cipher = Cipher.getInstance(C_AES_CBC_PKCS5PADDING);
         cipher.init(Cipher.DECRYPT_MODE, secretKey, ivSpec);
-        byte[] decrypted = cipher.doFinal(encrypted);
+        byte[] decrypted = cipher.doFinal(src);
+        return decrypted;
+    }
+
+    /**
+     * 需要BC支持<br>
+     * BouncyCastleProvider provider = new BouncyCastleProvider(); <br>
+     * Security.addProvider(provider);
+     */
+    @TargetApi(19)
+    public static byte[] encrypt(SecretKey secretKey, byte[] iv, byte[] aad, byte[] src)
+            throws Exception {
+        IvParameterSpec ivSpec = SecureUtil.getIv(iv);
+
+        Cipher cipher = Cipher.getInstance(C_AES_GCM);
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivSpec);
+        cipher.updateAAD(aad);
+        byte[] encrypted = cipher.doFinal(src);
+        return encrypted;
+    }
+
+    /**
+     * 需要BC支持<br>
+     * BouncyCastleProvider provider = new BouncyCastleProvider(); <br>
+     * Security.addProvider(provider);
+     */
+    @TargetApi(19)
+    public static byte[] decrypt(SecretKey secretKey, byte[] iv, byte[] aad, byte[] src)
+            throws Exception {
+        IvParameterSpec ivSpec = SecureUtil.getIv(iv);
+
+        Cipher cipher = Cipher.getInstance(C_AES_GCM);
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, ivSpec);
+        cipher.updateAAD(aad);
+        byte[] decrypted = cipher.doFinal(src);
         return decrypted;
     }
 

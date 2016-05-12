@@ -1,7 +1,6 @@
 tasks.withType(JavaCompile) { options.encoding = "UTF-8" }
 
 apply plugin: 'com.android.library'
-//apply from: '../../ext-android.gradle'
 apply from: "$rootDir/ext-android.gradle"
 
 android {
@@ -21,7 +20,39 @@ dependencies {
     //log
     compile 'com.github.tony19:logback-android-classic:1.1.1-4'
     compile 'com.github.tony19:logback-android-core:1.1.1-4'
-    compile 'org.slf4j:slf4j-api:1.7.12'
+    compile 'org.slf4j:slf4j-api:1.7.14'
 }
 
-version = project.versionName
+android.libraryVariants.all { variant ->
+    def name = variant.buildType.name
+    def task = project.tasks.create "jar${name.capitalize()}", Jar
+    task.dependsOn variant.javaCompile
+    task.from variant.javaCompile.destinationDir
+    artifacts.add('archives', task);
+}
+
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.srcDirs
+}
+
+artifacts {
+    archives androidSourcesJar
+}
+
+apply plugin: 'maven'
+uploadArchives {
+    repositories.mavenDeployer {
+        repository(url: RELEASE_REPOSITORY_URL) {
+            authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
+        }
+//        snapshotRepository(url: "http://xxx.xxx.xxx.xx:8080/content/repositories/snapshots") {
+//            authentication(userName: "xxxx", password: "xxxx")
+//        }
+        pom.version = versionName + "." + versionCode
+        pom.artifactId = POM_ARTIFACT_ID
+        pom.groupId = GROUP
+        pom.name = POM_NAME
+        pom.packaging = POM_PACKAGING
+    }
+}

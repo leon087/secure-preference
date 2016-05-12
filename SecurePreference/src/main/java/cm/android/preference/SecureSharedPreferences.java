@@ -19,7 +19,7 @@ public class SecureSharedPreferences implements SharedPreferences {
     private CryptoHelper helper;
 
     public SecureSharedPreferences(SharedPreferences original, ICipher keyCipher,
-            ICipher valueCipher) {
+                                   ICipher valueCipher) {
         this.prefs = original;
         helper = new CryptoHelper(keyCipher, valueCipher);
     }
